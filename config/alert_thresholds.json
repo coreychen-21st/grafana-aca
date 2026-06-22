@@ -1,0 +1,53 @@
+{
+  "_description": "Alert thresholds for all resource types. Used by sync_grafana_alerts.sh to compute dynamic thresholds.",
+  "app_service_plan": {
+    "sku_bandwidth_bytes_per_min": {
+      "B1": 781250000, "B2": 781250000, "B3": 781250000,
+      "S1": 781250000, "S2": 781250000, "S3": 781250000,
+      "P1v2": 1562500000, "P2v2": 3125000000, "P3v2": 6250000000,
+      "P1v3": 1562500000, "P2v3": 3125000000, "P3v3": 6250000000,
+      "P0v3": 781250000,
+      "P1v4": 1562500000,
+      "EP1": 1562500000, "EP2": 3125000000, "EP3": 6250000000,
+      "I1": 781250000, "I2": 1562500000, "I3": 3125000000,
+      "I1v2": 1562500000, "I2v2": 3125000000, "I3v2": 6250000000,
+      "DEFAULT": 781250000
+    },
+    "sku_disk_queue_max": {
+      "B1": 100, "B2": 200, "B3": 400,
+      "S1": 100, "S2": 200, "S3": 400,
+      "P1v2": 200, "P2v2": 400, "P3v2": 800,
+      "P1v3": 200, "P2v3": 400, "P3v3": 800,
+      "DEFAULT": 100
+    },
+    "socket_max": 1024,
+    "metric_groups": [
+      { "name": "ASP-Prod-CPU",            "metric": "CpuPercentage",              "aggregation": "Average", "warn": 80,  "crit": 90,  "unit": "%",   "eval_suffix": "%" },
+      { "name": "ASP-Prod-Memory",         "metric": "MemoryPercentage",           "aggregation": "Average", "warn": 80,  "crit": 90,  "unit": "%",   "eval_suffix": "%" },
+      { "name": "ASP-Prod-DiskQueue",      "metric": "DiskQueueLength",            "aggregation": "Average", "warn": "dynamic_disk", "crit": "dynamic_disk", "unit": "", "eval_suffix": "" },
+      { "name": "ASP-Prod-Network-In",     "metric": "BytesReceived",              "aggregation": "Total",   "warn": "dynamic_net",  "crit": "dynamic_net",  "unit": "bytes/min", "eval_suffix": "bytes/min" },
+      { "name": "ASP-Prod-Network-Out",    "metric": "BytesSent",                  "aggregation": "Total",   "warn": "dynamic_net",  "crit": "dynamic_net",  "unit": "bytes/min", "eval_suffix": "bytes/min" },
+      { "name": "ASP-Prod-SocketOutbound", "metric": "SocketOutboundEstablished",  "aggregation": "Average", "warn": "dynamic_socket", "crit": "dynamic_socket", "unit": "", "eval_suffix": "" }
+    ]
+  },
+  "redis_managed": {
+    "metric_groups": [
+      { "name": "Redis-Prod-Memory",       "metric": "usedmemorypercentage",       "aggregation": "Average", "warn": 80,  "crit": 90,  "unit": "%", "eval_suffix": "%" },
+      { "name": "Redis-Prod-CPU",          "metric": "serverLoad",                 "aggregation": "Average", "warn": 80,  "crit": 90,  "unit": "%", "eval_suffix": "%" },
+      { "name": "Redis-Prod-Connections",  "metric": "connectedclients",           "aggregation": "Average", "warn": 5000, "crit": 8000, "unit": "",  "eval_suffix": "" },
+      { "name": "Redis-Prod-CacheHit",     "metric": "cache_hit_ratio",            "aggregation": "expression", "warn": 90, "crit": 80, "unit": "%", "eval_suffix": "%", "evaluator_type": "lt" },
+      { "name": "Redis-Prod-Eviction",     "metric": "evictedkeys",                "aggregation": "Total",   "warn": 100, "crit": 500,  "unit": "",  "eval_suffix": "/min" },
+      { "name": "Redis-Prod-Errors",       "metric": "errors",                     "aggregation": "Total",   "warn": 0,   "crit": 10,   "unit": "",  "eval_suffix": "/min" }
+    ]
+  },
+  "sql_server": {
+    "metric_groups": [
+      { "name": "SQL-Prod-CPU",              "metric": "cpu_percent",               "aggregation": "Average", "warn": 80, "crit": 90, "unit": "%", "eval_suffix": "%" },
+      { "name": "SQL-Prod-DTU",              "metric": "dtu_consumption_percent",   "aggregation": "Average", "warn": 80, "crit": 90, "unit": "%", "eval_suffix": "%" },
+      { "name": "SQL-Prod-Storage",          "metric": "storage_percent",           "aggregation": "Average", "warn": 80, "crit": 90, "unit": "%", "eval_suffix": "%" },
+      { "name": "SQL-Prod-Deadlock",         "metric": "deadlock",                  "aggregation": "Total",   "warn": 0,  "crit": 5,  "unit": "",  "eval_suffix": "/hr" },
+      { "name": "SQL-Prod-ConnectionFailed", "metric": "connection_failed",         "aggregation": "Total",   "warn": 0,  "crit": 5,  "unit": "",  "eval_suffix": "/min" },
+      { "name": "SQL-Prod-Sessions",         "metric": "sessions_percent",          "aggregation": "Average", "warn": 80, "crit": 90, "unit": "%", "eval_suffix": "%" }
+    ]
+  }
+}

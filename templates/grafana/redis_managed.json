@@ -1,0 +1,866 @@
+{
+  "_comment": "Grafana Alert Rules Template for Azure Redis Managed (Azure Cache for Redis) - Prod",
+  "_version": "1.0.0",
+  "_resourceType": "Redis",
+  "_metricNamespace": "Microsoft.Cache/redis",
+  "_variablePlaceholders": {
+    "AZURE_DATASOURCE_UID": "Azure Monitor datasource UID in Grafana",
+    "RESOURCE_GROUP": "Azure resource group name",
+    "RESOURCE_NAME": "Redis cache name",
+    "SUBSCRIPTION_ID": "Azure subscription ID"
+  },
+  "groups": [
+    {
+      "name": "Redis-Prod-Memory",
+      "interval": "5m",
+      "rules": [
+        {
+          "uid": "redis-prod-mem-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Memory > 80% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "usedmemorypercentage",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [80], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "redis", "metric": "memory" },
+          "annotations": {
+            "summary": "Redis Memory > 80%",
+            "description": "${RESOURCE_NAME} usedmemorypercentage 在過去 60 分鐘平均超過 80%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%",
+            "runbook_url": "https://wiki.internal/runbook/redis-memory-high"
+          }
+        },
+        {
+          "uid": "redis-prod-mem-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Memory > 90% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "usedmemorypercentage",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [90], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "redis", "metric": "memory" },
+          "annotations": {
+            "summary": "Redis Memory > 90% - CRITICAL",
+            "description": "${RESOURCE_NAME} usedmemorypercentage 在過去 30 分鐘平均超過 90%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/redis-memory-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Redis-Prod-CPU",
+      "interval": "5m",
+      "rules": [
+        {
+          "uid": "redis-prod-cpu-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - CPU > 80% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "serverLoad",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [80], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "redis", "metric": "cpu" },
+          "annotations": {
+            "summary": "Redis CPU > 80%",
+            "description": "${RESOURCE_NAME} serverLoad 在過去 60 分鐘平均超過 80%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%",
+            "runbook_url": "https://wiki.internal/runbook/redis-cpu-high"
+          }
+        },
+        {
+          "uid": "redis-prod-cpu-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - CPU > 90% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "serverLoad",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [90], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "redis", "metric": "cpu" },
+          "annotations": {
+            "summary": "Redis CPU > 90% - CRITICAL",
+            "description": "${RESOURCE_NAME} serverLoad 在過去 30 分鐘平均超過 90%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/redis-cpu-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Redis-Prod-Connections",
+      "interval": "5m",
+      "rules": [
+        {
+          "uid": "redis-prod-conn-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Connections > 5000 (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "connectedclients",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [5000], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "redis", "metric": "connections" },
+          "annotations": {
+            "summary": "Redis Connections > 5000",
+            "description": "${RESOURCE_NAME} connectedclients 在過去 60 分鐘平均超過 5000。目前值: {{ $values.B.Value | printf \"%.0f\" }}",
+            "runbook_url": "https://wiki.internal/runbook/redis-connections-high"
+          }
+        },
+        {
+          "uid": "redis-prod-conn-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Connections > 8000 (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "connectedclients",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [8000], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "redis", "metric": "connections" },
+          "annotations": {
+            "summary": "Redis Connections > 8000 - CRITICAL",
+            "description": "${RESOURCE_NAME} connectedclients 在過去 30 分鐘平均超過 8000。目前值: {{ $values.B.Value | printf \"%.0f\" }}。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/redis-connections-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Redis-Prod-CacheHit",
+      "interval": "10m",
+      "rules": [
+        {
+          "uid": "redis-prod-hit-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Cache Hit Ratio < 90% (60min)",
+          "condition": "E",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "cachehits",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Total",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "cachemisses",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Total",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "D",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "B", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "E",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "F",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [90], "type": "lt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["F"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "F"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "F",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "math",
+                "expression": "$C / ($C + $D) * 100"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "redis", "metric": "cache_hit_ratio" },
+          "annotations": {
+            "summary": "Redis Cache Hit Ratio < 90%",
+            "description": "${RESOURCE_NAME} cache hit ratio 在過去 60 分鐘低於 90%。目前值: {{ $values.F.Value | printf \"%.1f\" }}%",
+            "runbook_url": "https://wiki.internal/runbook/redis-cache-hit-low"
+          }
+        },
+        {
+          "uid": "redis-prod-hit-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Cache Hit Ratio < 80% (30min)",
+          "condition": "E",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "cachehits",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Total",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "cachemisses",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Total",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "D",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "B", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "E",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "F",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [80], "type": "lt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["F"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "F"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "F",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "math",
+                "expression": "$C / ($C + $D) * 100"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "redis", "metric": "cache_hit_ratio" },
+          "annotations": {
+            "summary": "Redis Cache Hit Ratio < 80% - CRITICAL",
+            "description": "${RESOURCE_NAME} cache hit ratio 在過去 30 分鐘低於 80%。目前值: {{ $values.F.Value | printf \"%.1f\" }}%。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/redis-cache-hit-low"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Redis-Prod-Eviction",
+      "interval": "5m",
+      "rules": [
+        {
+          "uid": "redis-prod-evict-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Evicted Keys > 100/min (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "evictedkeys",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Total",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [100], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "redis", "metric": "evicted_keys" },
+          "annotations": {
+            "summary": "Redis Evicted Keys > 100/min",
+            "description": "${RESOURCE_NAME} evictedkeys 在過去 60 分鐘平均超過 100/min。目前值: {{ $values.B.Value | printf \"%.0f\" }}/min",
+            "runbook_url": "https://wiki.internal/runbook/redis-eviction-high"
+          }
+        },
+        {
+          "uid": "redis-prod-evict-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Evicted Keys > 500/min (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "evictedkeys",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Total",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [500], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "redis", "metric": "evicted_keys" },
+          "annotations": {
+            "summary": "Redis Evicted Keys > 500/min - CRITICAL",
+            "description": "${RESOURCE_NAME} evictedkeys 在過去 30 分鐘平均超過 500/min。目前值: {{ $values.B.Value | printf \"%.0f\" }}/min。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/redis-eviction-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Redis-Prod-Errors",
+      "interval": "5m",
+      "rules": [
+        {
+          "uid": "redis-prod-err-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Errors > 0 (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "errors",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Total",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [0], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "redis", "metric": "errors" },
+          "annotations": {
+            "summary": "Redis Errors Detected",
+            "description": "${RESOURCE_NAME} 在過去 60 分鐘內偵測到 errors。目前值: {{ $values.B.Value | printf \"%.0f\" }}/min",
+            "runbook_url": "https://wiki.internal/runbook/redis-errors"
+          }
+        },
+        {
+          "uid": "redis-prod-err-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Errors > 10/min (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Cache/redis",
+                  "metricName": "errors",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Total",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [10], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "redis", "metric": "errors" },
+          "annotations": {
+            "summary": "Redis Errors > 10/min - CRITICAL",
+            "description": "${RESOURCE_NAME} 在過去 30 分鐘內 errors 平均超過 10/min。目前值: {{ $values.B.Value | printf \"%.0f\" }}/min。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/redis-errors"
+          }
+        }
+      ]
+    }
+  ]
+}

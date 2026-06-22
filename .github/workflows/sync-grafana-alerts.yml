@@ -1,0 +1,96 @@
+name: Sync Grafana Alert Rules
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_call:
+  workflow_dispatch:
+
+env:
+  GRAFANA_URL: ${{ vars.GRAFANA_URL }}
+  AZURE_DATASOURCE_UID: ${{ vars.AZURE_DATASOURCE_UID }}
+
+jobs:
+  discover-ca804030:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login (CA804030)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID_CA804030 }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: c9f80f0b-7d34-4410-a79c-ca23fb550d20
+          enable-AzPSSession: false
+
+      - name: Discover Resources
+        run: |
+          bash scripts/discover_resources.sh \
+            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
+            --output inventory_ca804030.json
+
+      - name: Upload Inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: inventory-ca804030
+          path: inventory_ca804030.json
+          retention-days: 1
+
+  discover-ca808046:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login (CA808046)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID_CA808046 }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID_CA808046 }}
+          subscription-id: fc6b18ca-199c-4123-8097-834cfc7ac213
+          enable-AzPSSession: false
+
+      - name: Discover Resources
+        run: |
+          bash scripts/discover_resources.sh \
+            --subscription fc6b18ca-199c-4123-8097-834cfc7ac213 \
+            --output inventory_ca808046.json
+
+      - name: Upload Inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: inventory-ca808046
+          path: inventory_ca808046.json
+          retention-days: 1
+
+  sync:
+    needs: [discover-ca804030, discover-ca808046]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Inventories
+        uses: actions/download-artifact@v4
+        with:
+          pattern: inventory-*
+          merge-multiple: true
+          path: .
+
+      - name: Merge Inventories
+        run: |
+          jq -s 'add' inventory_ca804030.json inventory_ca808046.json > inventory.json
+          echo "Merged inventory:"
+          jq -r '.[] | "  [\(.type)] \(.project) / \(.name)"' inventory.json
+
+      - name: Plan (Diff)
+        run: bash scripts/sync_grafana_alerts.sh plan
+        env:
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+
+      - name: Apply Changes
+        run: bash scripts/sync_grafana_alerts.sh apply
+        env:
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+
+      - name: Summary
+        run: bash scripts/sync_grafana_alerts.sh summary >> $GITHUB_STEP_SUMMARY

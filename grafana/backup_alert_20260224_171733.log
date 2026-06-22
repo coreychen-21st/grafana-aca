@@ -1,0 +1,216 @@
+[2026-02-24 17:17:33] ==> [備用模式] 確認 Grafana 連線: https://grafana-aca.credithome.com.tw
+[2026-02-24 17:17:33]     連線正常
+[2026-02-24 17:17:33] ==> 確認 Grafana Folder: Backup-Alerts
+[2026-02-24 17:17:33]     既有 Folder UID: ffe6qk7gi9gxsf
+[2026-02-24 17:17:33] ==> 找到 12 個 Prod ASP，開始套用備用告警...
+[2026-02-24 17:17:33]     備用參數: interval=10m | warn_pending=90m | crit_pending=45m
+[2026-02-24 17:17:33] 
+[2026-02-24 17:17:33] >> paylaterRG/AppPlan-PayLater-Prod-Public (SKU: P0V3)
+[2026-02-24 17:17:33]     Rules 數量: 12
+[2026-02-24 17:17:34]     [OK] [WARN] AppPlan-PayLater-Prod-Public - CPU Warning > 80% (60min)
+[2026-02-24 17:17:34]     [OK] [CRIT] AppPlan-PayLater-Prod-Public - CPU Critical > 90% (30min)
+[2026-02-24 17:17:34]     [OK] [WARN] AppPlan-PayLater-Prod-Public - Memory Warning > 80% (60min)
+[2026-02-24 17:17:34]     [OK] [CRIT] AppPlan-PayLater-Prod-Public - Memory Critical > 90% (30min)
+[2026-02-24 17:17:35]     [OK] [WARN] AppPlan-PayLater-Prod-Public - Disk Queue Warning > 80% (60min)
+[2026-02-24 17:17:35]     [OK] [CRIT] AppPlan-PayLater-Prod-Public - Disk Queue Critical > 90% (30min)
+[2026-02-24 17:17:35]     [OK] [WARN] AppPlan-PayLater-Prod-Public - Network In Warning > 80% (60min)
+[2026-02-24 17:17:35]     [OK] [CRIT] AppPlan-PayLater-Prod-Public - Network In Critical > 90% (30min)
+[2026-02-24 17:17:36]     [OK] [WARN] AppPlan-PayLater-Prod-Public - Network Out Warning > 80% (60min)
+[2026-02-24 17:17:36]     [OK] [CRIT] AppPlan-PayLater-Prod-Public - Network Out Critical > 90% (30min)
+[2026-02-24 17:17:36]     [OK] [WARN] AppPlan-PayLater-Prod-Public - Socket Outbound Warning > 80% (60min)
+[2026-02-24 17:17:36]     [OK] [CRIT] AppPlan-PayLater-Prod-Public - Socket Outbound Critical > 90% (30min)
+[2026-02-24 17:17:36]    完成: AppPlan-PayLater-Prod-Public
+[2026-02-24 17:17:36] 
+[2026-02-24 17:17:36] >> paylaterRG/AppPlan-PayLater-Prod-Batch (SKU: P0V3)
+[2026-02-24 17:17:36]     Rules 數量: 12
+[2026-02-24 17:17:37]     [OK] [WARN] AppPlan-PayLater-Prod-Batch - CPU Warning > 80% (60min)
+[2026-02-24 17:17:37]     [OK] [CRIT] AppPlan-PayLater-Prod-Batch - CPU Critical > 90% (30min)
+[2026-02-24 17:17:37]     [OK] [WARN] AppPlan-PayLater-Prod-Batch - Memory Warning > 80% (60min)
+[2026-02-24 17:17:37]     [OK] [CRIT] AppPlan-PayLater-Prod-Batch - Memory Critical > 90% (30min)
+[2026-02-24 17:17:38]     [OK] [WARN] AppPlan-PayLater-Prod-Batch - Disk Queue Warning > 80% (60min)
+[2026-02-24 17:17:38]     [OK] [CRIT] AppPlan-PayLater-Prod-Batch - Disk Queue Critical > 90% (30min)
+[2026-02-24 17:17:38]     [OK] [WARN] AppPlan-PayLater-Prod-Batch - Network In Warning > 80% (60min)
+[2026-02-24 17:17:38]     [OK] [CRIT] AppPlan-PayLater-Prod-Batch - Network In Critical > 90% (30min)
+[2026-02-24 17:17:39]     [OK] [WARN] AppPlan-PayLater-Prod-Batch - Network Out Warning > 80% (60min)
+[2026-02-24 17:17:39]     [OK] [CRIT] AppPlan-PayLater-Prod-Batch - Network Out Critical > 90% (30min)
+[2026-02-24 17:17:39]     [OK] [WARN] AppPlan-PayLater-Prod-Batch - Socket Outbound Warning > 80% (60min)
+[2026-02-24 17:17:39]     [OK] [CRIT] AppPlan-PayLater-Prod-Batch - Socket Outbound Critical > 90% (30min)
+[2026-02-24 17:17:39]    完成: AppPlan-PayLater-Prod-Batch
+[2026-02-24 17:17:39] 
+[2026-02-24 17:17:39] >> paylaterRG/AppPlan-PayLater-Prod-Internal (SKU: P0V3)
+[2026-02-24 17:17:39]     Rules 數量: 12
+[2026-02-24 17:17:40]     [OK] [WARN] AppPlan-PayLater-Prod-Internal - CPU Warning > 80% (60min)
+[2026-02-24 17:17:40]     [OK] [CRIT] AppPlan-PayLater-Prod-Internal - CPU Critical > 90% (30min)
+[2026-02-24 17:17:40]     [OK] [WARN] AppPlan-PayLater-Prod-Internal - Memory Warning > 80% (60min)
+[2026-02-24 17:17:40]     [OK] [CRIT] AppPlan-PayLater-Prod-Internal - Memory Critical > 90% (30min)
+[2026-02-24 17:17:41]     [OK] [WARN] AppPlan-PayLater-Prod-Internal - Disk Queue Warning > 80% (60min)
+[2026-02-24 17:17:41]     [OK] [CRIT] AppPlan-PayLater-Prod-Internal - Disk Queue Critical > 90% (30min)
+[2026-02-24 17:17:41]     [OK] [WARN] AppPlan-PayLater-Prod-Internal - Network In Warning > 80% (60min)
+[2026-02-24 17:17:41]     [OK] [CRIT] AppPlan-PayLater-Prod-Internal - Network In Critical > 90% (30min)
+[2026-02-24 17:17:42]     [OK] [WARN] AppPlan-PayLater-Prod-Internal - Network Out Warning > 80% (60min)
+[2026-02-24 17:17:42]     [OK] [CRIT] AppPlan-PayLater-Prod-Internal - Network Out Critical > 90% (30min)
+[2026-02-24 17:17:42]     [OK] [WARN] AppPlan-PayLater-Prod-Internal - Socket Outbound Warning > 80% (60min)
+[2026-02-24 17:17:42]     [OK] [CRIT] AppPlan-PayLater-Prod-Internal - Socket Outbound Critical > 90% (30min)
+[2026-02-24 17:17:42]    完成: AppPlan-PayLater-Prod-Internal
+[2026-02-24 17:17:42] 
+[2026-02-24 17:17:42] >> paylaterRG/AppPlan-PayLater-Prod-Partner (SKU: P0V3)
+[2026-02-24 17:17:42]     Rules 數量: 12
+[2026-02-24 17:17:43]     [OK] [WARN] AppPlan-PayLater-Prod-Partner - CPU Warning > 80% (60min)
+[2026-02-24 17:17:43]     [OK] [CRIT] AppPlan-PayLater-Prod-Partner - CPU Critical > 90% (30min)
+[2026-02-24 17:17:43]     [OK] [WARN] AppPlan-PayLater-Prod-Partner - Memory Warning > 80% (60min)
+[2026-02-24 17:17:43]     [OK] [CRIT] AppPlan-PayLater-Prod-Partner - Memory Critical > 90% (30min)
+[2026-02-24 17:17:44]     [OK] [WARN] AppPlan-PayLater-Prod-Partner - Disk Queue Warning > 80% (60min)
+[2026-02-24 17:17:44]     [OK] [CRIT] AppPlan-PayLater-Prod-Partner - Disk Queue Critical > 90% (30min)
+[2026-02-24 17:17:44]     [OK] [WARN] AppPlan-PayLater-Prod-Partner - Network In Warning > 80% (60min)
+[2026-02-24 17:17:44]     [OK] [CRIT] AppPlan-PayLater-Prod-Partner - Network In Critical > 90% (30min)
+[2026-02-24 17:17:45]     [OK] [WARN] AppPlan-PayLater-Prod-Partner - Network Out Warning > 80% (60min)
+[2026-02-24 17:17:45]     [OK] [CRIT] AppPlan-PayLater-Prod-Partner - Network Out Critical > 90% (30min)
+[2026-02-24 17:17:45]     [OK] [WARN] AppPlan-PayLater-Prod-Partner - Socket Outbound Warning > 80% (60min)
+[2026-02-24 17:17:45]     [OK] [CRIT] AppPlan-PayLater-Prod-Partner - Socket Outbound Critical > 90% (30min)
+[2026-02-24 17:17:45]    完成: AppPlan-PayLater-Prod-Partner
+[2026-02-24 17:17:45] 
+[2026-02-24 17:17:45] >> Majipay資源群組/AppPlan-Majipay-Prod-Frontend (SKU: P0V3)
+[2026-02-24 17:17:45]     Rules 數量: 12
+[2026-02-24 17:17:46]     [OK] [WARN] AppPlan-Majipay-Prod-Frontend - CPU Warning > 80% (60min)
+[2026-02-24 17:17:46]     [OK] [CRIT] AppPlan-Majipay-Prod-Frontend - CPU Critical > 90% (30min)
+[2026-02-24 17:17:46]     [OK] [WARN] AppPlan-Majipay-Prod-Frontend - Memory Warning > 80% (60min)
+[2026-02-24 17:17:46]     [OK] [CRIT] AppPlan-Majipay-Prod-Frontend - Memory Critical > 90% (30min)
+[2026-02-24 17:17:47]     [OK] [WARN] AppPlan-Majipay-Prod-Frontend - Disk Queue Warning > 80% (60min)
+[2026-02-24 17:17:47]     [OK] [CRIT] AppPlan-Majipay-Prod-Frontend - Disk Queue Critical > 90% (30min)
+[2026-02-24 17:17:47]     [OK] [WARN] AppPlan-Majipay-Prod-Frontend - Network In Warning > 80% (60min)
+[2026-02-24 17:17:47]     [OK] [CRIT] AppPlan-Majipay-Prod-Frontend - Network In Critical > 90% (30min)
+[2026-02-24 17:17:48]     [OK] [WARN] AppPlan-Majipay-Prod-Frontend - Network Out Warning > 80% (60min)
+[2026-02-24 17:17:48]     [OK] [CRIT] AppPlan-Majipay-Prod-Frontend - Network Out Critical > 90% (30min)
+[2026-02-24 17:17:48]     [OK] [WARN] AppPlan-Majipay-Prod-Frontend - Socket Outbound Warning > 80% (60min)
+[2026-02-24 17:17:48]     [OK] [CRIT] AppPlan-Majipay-Prod-Frontend - Socket Outbound Critical > 90% (30min)
+[2026-02-24 17:17:48]    完成: AppPlan-Majipay-Prod-Frontend
+[2026-02-24 17:17:48] 
+[2026-02-24 17:17:48] >> EDDA_RG/AppPlan-EDDA-Prod-Public (SKU: P0V3)
+[2026-02-24 17:17:48]     Rules 數量: 12
+[2026-02-24 17:17:49]     [OK] [WARN] AppPlan-EDDA-Prod-Public - CPU Warning > 80% (60min)
+[2026-02-24 17:17:49]     [OK] [CRIT] AppPlan-EDDA-Prod-Public - CPU Critical > 90% (30min)
+[2026-02-24 17:17:49]     [OK] [WARN] AppPlan-EDDA-Prod-Public - Memory Warning > 80% (60min)
+[2026-02-24 17:17:49]     [OK] [CRIT] AppPlan-EDDA-Prod-Public - Memory Critical > 90% (30min)
+[2026-02-24 17:17:50]     [OK] [WARN] AppPlan-EDDA-Prod-Public - Disk Queue Warning > 80% (60min)
+[2026-02-24 17:17:50]     [OK] [CRIT] AppPlan-EDDA-Prod-Public - Disk Queue Critical > 90% (30min)
+[2026-02-24 17:17:50]     [OK] [WARN] AppPlan-EDDA-Prod-Public - Network In Warning > 80% (60min)
+[2026-02-24 17:17:50]     [OK] [CRIT] AppPlan-EDDA-Prod-Public - Network In Critical > 90% (30min)
+[2026-02-24 17:17:51]     [OK] [WARN] AppPlan-EDDA-Prod-Public - Network Out Warning > 80% (60min)
+[2026-02-24 17:17:51]     [OK] [CRIT] AppPlan-EDDA-Prod-Public - Network Out Critical > 90% (30min)
+[2026-02-24 17:17:51]     [OK] [WARN] AppPlan-EDDA-Prod-Public - Socket Outbound Warning > 80% (60min)
+[2026-02-24 17:17:51]     [OK] [CRIT] AppPlan-EDDA-Prod-Public - Socket Outbound Critical > 90% (30min)
+[2026-02-24 17:17:51]    完成: AppPlan-EDDA-Prod-Public
+[2026-02-24 17:17:51] 
+[2026-02-24 17:17:51] >> 廿一世紀數位科技股份有限公司/AppPlan-Happyfan7-Prod-Frontend (SKU: P0V3)
+[2026-02-24 17:17:51]     Rules 數量: 12
+[2026-02-24 17:17:52]     [OK] [WARN] AppPlan-Happyfan7-Prod-Frontend - CPU Warning > 80% (60min)
+[2026-02-24 17:17:52]     [OK] [CRIT] AppPlan-Happyfan7-Prod-Frontend - CPU Critical > 90% (30min)
+[2026-02-24 17:17:52]     [OK] [WARN] AppPlan-Happyfan7-Prod-Frontend - Memory Warning > 80% (60min)
+[2026-02-24 17:17:52]     [OK] [CRIT] AppPlan-Happyfan7-Prod-Frontend - Memory Critical > 90% (30min)
+[2026-02-24 17:17:53]     [OK] [WARN] AppPlan-Happyfan7-Prod-Frontend - Disk Queue Warning > 80% (60min)
+[2026-02-24 17:17:53]     [OK] [CRIT] AppPlan-Happyfan7-Prod-Frontend - Disk Queue Critical > 90% (30min)
+[2026-02-24 17:17:53]     [OK] [WARN] AppPlan-Happyfan7-Prod-Frontend - Network In Warning > 80% (60min)
+[2026-02-24 17:17:53]     [OK] [CRIT] AppPlan-Happyfan7-Prod-Frontend - Network In Critical > 90% (30min)
+[2026-02-24 17:17:54]     [OK] [WARN] AppPlan-Happyfan7-Prod-Frontend - Network Out Warning > 80% (60min)
+[2026-02-24 17:17:54]     [OK] [CRIT] AppPlan-Happyfan7-Prod-Frontend - Network Out Critical > 90% (30min)
+[2026-02-24 17:17:54]     [OK] [WARN] AppPlan-Happyfan7-Prod-Frontend - Socket Outbound Warning > 80% (60min)
+[2026-02-24 17:17:54]     [OK] [CRIT] AppPlan-Happyfan7-Prod-Frontend - Socket Outbound Critical > 90% (30min)
+[2026-02-24 17:17:54]    完成: AppPlan-Happyfan7-Prod-Frontend
+[2026-02-24 17:17:54] 
+[2026-02-24 17:17:54] >> Majipay資源群組/Majipay正式機方案 (SKU: P2V3)
+[2026-02-24 17:17:54]     Rules 數量: 12
+[2026-02-24 17:17:55]     [OK] [WARN] Majipay正式機方案 - CPU Warning > 80% (60min)
+[2026-02-24 17:17:55]     [OK] [CRIT] Majipay正式機方案 - CPU Critical > 90% (30min)
+[2026-02-24 17:17:55]     [OK] [WARN] Majipay正式機方案 - Memory Warning > 80% (60min)
+[2026-02-24 17:17:55]     [OK] [CRIT] Majipay正式機方案 - Memory Critical > 90% (30min)
+[2026-02-24 17:17:56]     [OK] [WARN] Majipay正式機方案 - Disk Queue Warning > 80% (60min)
+[2026-02-24 17:17:56]     [OK] [CRIT] Majipay正式機方案 - Disk Queue Critical > 90% (30min)
+[2026-02-24 17:17:56]     [OK] [WARN] Majipay正式機方案 - Network In Warning > 80% (60min)
+[2026-02-24 17:17:56]     [OK] [CRIT] Majipay正式機方案 - Network In Critical > 90% (30min)
+[2026-02-24 17:17:57]     [OK] [WARN] Majipay正式機方案 - Network Out Warning > 80% (60min)
+[2026-02-24 17:17:57]     [OK] [CRIT] Majipay正式機方案 - Network Out Critical > 90% (30min)
+[2026-02-24 17:17:57]     [OK] [WARN] Majipay正式機方案 - Socket Outbound Warning > 80% (60min)
+[2026-02-24 17:17:57]     [OK] [CRIT] Majipay正式機方案 - Socket Outbound Critical > 90% (30min)
+[2026-02-24 17:17:57]    完成: Majipay正式機方案
+[2026-02-24 17:17:57] 
+[2026-02-24 17:17:57] >> 廿一世紀數位科技股份有限公司/樂分期正式機 (SKU: P2V3)
+[2026-02-24 17:17:57]     Rules 數量: 12
+[2026-02-24 17:17:58]     [OK] [WARN] 樂分期正式機 - CPU Warning > 80% (60min)
+[2026-02-24 17:17:58]     [OK] [CRIT] 樂分期正式機 - CPU Critical > 90% (30min)
+[2026-02-24 17:17:58]     [OK] [WARN] 樂分期正式機 - Memory Warning > 80% (60min)
+[2026-02-24 17:17:58]     [OK] [CRIT] 樂分期正式機 - Memory Critical > 90% (30min)
+[2026-02-24 17:17:59]     [OK] [WARN] 樂分期正式機 - Disk Queue Warning > 80% (60min)
+[2026-02-24 17:17:59]     [OK] [CRIT] 樂分期正式機 - Disk Queue Critical > 90% (30min)
+[2026-02-24 17:17:59]     [OK] [WARN] 樂分期正式機 - Network In Warning > 80% (60min)
+[2026-02-24 17:17:59]     [OK] [CRIT] 樂分期正式機 - Network In Critical > 90% (30min)
+[2026-02-24 17:18:00]     [OK] [WARN] 樂分期正式機 - Network Out Warning > 80% (60min)
+[2026-02-24 17:18:00]     [OK] [CRIT] 樂分期正式機 - Network Out Critical > 90% (30min)
+[2026-02-24 17:18:00]     [OK] [WARN] 樂分期正式機 - Socket Outbound Warning > 80% (60min)
+[2026-02-24 17:18:00]     [OK] [CRIT] 樂分期正式機 - Socket Outbound Critical > 90% (30min)
+[2026-02-24 17:18:00]    完成: 樂分期正式機
+[2026-02-24 17:18:00] 
+[2026-02-24 17:18:00] >> flash-finance-resourcegroup/AppPlan-FlashFinance-Prod-Frontend (SKU: P0V3)
+[2026-02-24 17:18:00]     Rules 數量: 12
+[2026-02-24 17:18:01]     [OK] [WARN] AppPlan-FlashFinance-Prod-Frontend - CPU Warning > 80% (60min)
+[2026-02-24 17:18:01]     [OK] [CRIT] AppPlan-FlashFinance-Prod-Frontend - CPU Critical > 90% (30min)
+[2026-02-24 17:18:01]     [OK] [WARN] AppPlan-FlashFinance-Prod-Frontend - Memory Warning > 80% (60min)
+[2026-02-24 17:18:01]     [OK] [CRIT] AppPlan-FlashFinance-Prod-Frontend - Memory Critical > 90% (30min)
+[2026-02-24 17:18:02]     [OK] [WARN] AppPlan-FlashFinance-Prod-Frontend - Disk Queue Warning > 80% (60min)
+[2026-02-24 17:18:02]     [OK] [CRIT] AppPlan-FlashFinance-Prod-Frontend - Disk Queue Critical > 90% (30min)
+[2026-02-24 17:18:02]     [OK] [WARN] AppPlan-FlashFinance-Prod-Frontend - Network In Warning > 80% (60min)
+[2026-02-24 17:18:02]     [OK] [CRIT] AppPlan-FlashFinance-Prod-Frontend - Network In Critical > 90% (30min)
+[2026-02-24 17:18:03]     [OK] [WARN] AppPlan-FlashFinance-Prod-Frontend - Network Out Warning > 80% (60min)
+[2026-02-24 17:18:03]     [OK] [CRIT] AppPlan-FlashFinance-Prod-Frontend - Network Out Critical > 90% (30min)
+[2026-02-24 17:18:03]     [OK] [WARN] AppPlan-FlashFinance-Prod-Frontend - Socket Outbound Warning > 80% (60min)
+[2026-02-24 17:18:03]     [OK] [CRIT] AppPlan-FlashFinance-Prod-Frontend - Socket Outbound Critical > 90% (30min)
+[2026-02-24 17:18:03]    完成: AppPlan-FlashFinance-Prod-Frontend
+[2026-02-24 17:18:04] 
+[2026-02-24 17:18:04] >> flash-finance-resourcegroup/flashfinance正式機方案 (SKU: P1V4)
+[2026-02-24 17:18:04]     Rules 數量: 12
+[2026-02-24 17:18:04]     [OK] [WARN] flashfinance正式機方案 - CPU Warning > 80% (60min)
+[2026-02-24 17:18:04]     [OK] [CRIT] flashfinance正式機方案 - CPU Critical > 90% (30min)
+[2026-02-24 17:18:04]     [OK] [WARN] flashfinance正式機方案 - Memory Warning > 80% (60min)
+[2026-02-24 17:18:05]     [OK] [CRIT] flashfinance正式機方案 - Memory Critical > 90% (30min)
+[2026-02-24 17:18:05]     [OK] [WARN] flashfinance正式機方案 - Disk Queue Warning > 80% (60min)
+[2026-02-24 17:18:05]     [OK] [CRIT] flashfinance正式機方案 - Disk Queue Critical > 90% (30min)
+[2026-02-24 17:18:05]     [OK] [WARN] flashfinance正式機方案 - Network In Warning > 80% (60min)
+[2026-02-24 17:18:05]     [OK] [CRIT] flashfinance正式機方案 - Network In Critical > 90% (30min)
+[2026-02-24 17:18:06]     [OK] [WARN] flashfinance正式機方案 - Network Out Warning > 80% (60min)
+[2026-02-24 17:18:06]     [OK] [CRIT] flashfinance正式機方案 - Network Out Critical > 90% (30min)
+[2026-02-24 17:18:06]     [OK] [WARN] flashfinance正式機方案 - Socket Outbound Warning > 80% (60min)
+[2026-02-24 17:18:06]     [OK] [CRIT] flashfinance正式機方案 - Socket Outbound Critical > 90% (30min)
+[2026-02-24 17:18:06]    完成: flashfinance正式機方案
+[2026-02-24 17:18:06] 
+[2026-02-24 17:18:07] >> aiservice-rg/ASP-AIService (SKU: P0V3)
+[2026-02-24 17:18:07]     Rules 數量: 12
+[2026-02-24 17:18:07]     [OK] [WARN] ASP-AIService - CPU Warning > 80% (60min)
+[2026-02-24 17:18:07]     [OK] [CRIT] ASP-AIService - CPU Critical > 90% (30min)
+[2026-02-24 17:18:07]     [OK] [WARN] ASP-AIService - Memory Warning > 80% (60min)
+[2026-02-24 17:18:08]     [OK] [CRIT] ASP-AIService - Memory Critical > 90% (30min)
+[2026-02-24 17:18:08]     [OK] [WARN] ASP-AIService - Disk Queue Warning > 80% (60min)
+[2026-02-24 17:18:08]     [OK] [CRIT] ASP-AIService - Disk Queue Critical > 90% (30min)
+[2026-02-24 17:18:08]     [OK] [WARN] ASP-AIService - Network In Warning > 80% (60min)
+[2026-02-24 17:18:08]     [OK] [CRIT] ASP-AIService - Network In Critical > 90% (30min)
+[2026-02-24 17:18:09]     [OK] [WARN] ASP-AIService - Network Out Warning > 80% (60min)
+[2026-02-24 17:18:09]     [OK] [CRIT] ASP-AIService - Network Out Critical > 90% (30min)
+[2026-02-24 17:18:09]     [OK] [WARN] ASP-AIService - Socket Outbound Warning > 80% (60min)
+[2026-02-24 17:18:09]     [OK] [CRIT] ASP-AIService - Socket Outbound Critical > 90% (30min)
+[2026-02-24 17:18:09]    完成: ASP-AIService
+[2026-02-24 17:18:09] 
+[2026-02-24 17:18:09] ==> 提示：建議在 Grafana 設定獨立的 Notification Policy
+[2026-02-24 17:18:09]     Matchers: alert_source=grafana-backup, alert_tier=backup
+[2026-02-24 17:18:09]     路由到低優先度管道（如 Slack #alerts-backup）
+[2026-02-24 17:18:09]     避免與 Azure Monitor 告警產生重複通知
+[2026-02-24 17:18:09] ============================================
+[2026-02-24 17:18:09]  [備用告警] 套用完成
+[2026-02-24 17:18:09]    成功 ASP : 12 個
+[2026-02-24 17:18:09]    失敗群組 : 0 個
+[2026-02-24 17:18:09]    Folder   : https://grafana-aca.credithome.com.tw/alerting/list
+[2026-02-24 17:18:09]    Log 檔案 : backup_alert_20260224_171733.log
+[2026-02-24 17:18:09] 
+[2026-02-24 17:18:09]  備用模式參數 vs 主要告警 (Azure Monitor)：
+[2026-02-24 17:18:09]    Eval interval : 10m     (主要: 5m)
+[2026-02-24 17:18:09]    Warn pending  : 90m    (主要: 60m)
+[2026-02-24 17:18:09]    Crit pending  : 45m    (主要: 30m)
+[2026-02-24 17:18:09]    Label         : alert_source=grafana-backup
+[2026-02-24 17:18:09] ============================================

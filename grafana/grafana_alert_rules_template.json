@@ -1,0 +1,1180 @@
+{
+  "_comment": "Grafana Alert Rules Template for Azure App Service Plan - Prod (BACKUP MODE)",
+  "_version": "2.0.0",
+  "_mode": "backup",
+  "_primary": "Azure Monitor (02_azure_monitor_alert_rules.sh)",
+  "_rules": "WARNING: 90min > 80% | CRITICAL: 45min > 90% (備用模式，eval interval=10m)",
+  "_note": "此 template 由 03_apply_grafana_alerts.sh 使用，定位為備用告警。主要告警由 Azure Monitor 負責。",
+  "groups": [
+    {
+      "name": "AppServicePlan-Prod-CPU",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "asp-prod-cpu-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - CPU Warning > 80% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${ASP_NAME}",
+                  "metricNamespace": "Microsoft.Web/serverfarms",
+                  "metricName": "CpuPercentage",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": {
+                "from": 3600,
+                "to": 0
+              }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "reduce",
+                "expression": "A",
+                "reducer": "mean",
+                "settings": {}
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        80
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "query": {
+                      "params": [
+                        "B"
+                      ]
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": {
+            "severity": "warning",
+            "environment": "prod",
+            "resource_type": "app_service_plan",
+            "metric": "cpu"
+          },
+          "annotations": {
+            "summary": "App Service Plan CPU 使用率超過 80%",
+            "description": "App Service Plan ${RESOURCE_NAME} 的 CPU 平均使用率在過去 60 分鐘持續超過 80%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%",
+            "runbook_url": "https://wiki.internal/runbook/asp-cpu-high"
+          }
+        },
+        {
+          "uid": "asp-prod-cpu-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - CPU Critical > 90% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${ASP_NAME}",
+                  "metricNamespace": "Microsoft.Web/serverfarms",
+                  "metricName": "CpuPercentage",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": {
+                "from": 1800,
+                "to": 0
+              }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "reduce",
+                "expression": "A",
+                "reducer": "mean",
+                "settings": {}
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        90
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "query": {
+                      "params": [
+                        "B"
+                      ]
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": {
+            "severity": "critical",
+            "environment": "prod",
+            "resource_type": "app_service_plan",
+            "metric": "cpu"
+          },
+          "annotations": {
+            "summary": "App Service Plan CPU 使用率超過 90% - 緊急",
+            "description": "App Service Plan ${RESOURCE_NAME} 的 CPU 平均使用率在過去 30 分鐘持續超過 90%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/asp-cpu-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AppServicePlan-Prod-Memory",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "asp-prod-mem-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Memory Warning > 80% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${ASP_NAME}",
+                  "metricNamespace": "Microsoft.Web/serverfarms",
+                  "metricName": "MemoryPercentage",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": {
+                "from": 3600,
+                "to": 0
+              }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "reduce",
+                "expression": "A",
+                "reducer": "mean",
+                "settings": {}
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        80
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "query": {
+                      "params": [
+                        "B"
+                      ]
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": {
+            "severity": "warning",
+            "environment": "prod",
+            "resource_type": "app_service_plan",
+            "metric": "memory"
+          },
+          "annotations": {
+            "summary": "App Service Plan Memory 使用率超過 80%",
+            "description": "App Service Plan ${RESOURCE_NAME} 的 Memory 平均使用率在過去 60 分鐘持續超過 80%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%",
+            "runbook_url": "https://wiki.internal/runbook/asp-memory-high"
+          }
+        },
+        {
+          "uid": "asp-prod-mem-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Memory Critical > 90% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${ASP_NAME}",
+                  "metricNamespace": "Microsoft.Web/serverfarms",
+                  "metricName": "MemoryPercentage",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": {
+                "from": 1800,
+                "to": 0
+              }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "reduce",
+                "expression": "A",
+                "reducer": "mean",
+                "settings": {}
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        90
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "query": {
+                      "params": [
+                        "B"
+                      ]
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": {
+            "severity": "critical",
+            "environment": "prod",
+            "resource_type": "app_service_plan",
+            "metric": "memory"
+          },
+          "annotations": {
+            "summary": "App Service Plan Memory 使用率超過 90% - 緊急",
+            "description": "App Service Plan ${RESOURCE_NAME} 的 Memory 平均使用率在過去 30 分鐘持續超過 90%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/asp-memory-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AppServicePlan-Prod-DiskQueue",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "asp-prod-disk-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Disk Queue Warning > 80% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${ASP_NAME}",
+                  "metricNamespace": "Microsoft.Web/serverfarms",
+                  "metricName": "DiskQueueLength",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": {
+                "from": 3600,
+                "to": 0
+              }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "reduce",
+                "expression": "A",
+                "reducer": "mean",
+                "settings": {}
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        "${DISK_WARN_THRESHOLD}"
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "query": {
+                      "params": [
+                        "B"
+                      ]
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": {
+            "severity": "warning",
+            "environment": "prod",
+            "resource_type": "app_service_plan",
+            "metric": "disk_queue"
+          },
+          "annotations": {
+            "summary": "App Service Plan Disk Queue 過高 (WARNING)",
+            "description": "App Service Plan ${RESOURCE_NAME} 的 Disk Queue Length 在過去 60 分鐘平均超過警戒值 ${DISK_WARN_THRESHOLD}。目前值: {{ $values.B.Value | printf \"%.0f\" }}",
+            "runbook_url": "https://wiki.internal/runbook/asp-disk-high"
+          }
+        },
+        {
+          "uid": "asp-prod-disk-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Disk Queue Critical > 90% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${ASP_NAME}",
+                  "metricNamespace": "Microsoft.Web/serverfarms",
+                  "metricName": "DiskQueueLength",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": {
+                "from": 1800,
+                "to": 0
+              }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "reduce",
+                "expression": "A",
+                "reducer": "mean",
+                "settings": {}
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        "${DISK_CRIT_THRESHOLD}"
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "query": {
+                      "params": [
+                        "B"
+                      ]
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": {
+            "severity": "critical",
+            "environment": "prod",
+            "resource_type": "app_service_plan",
+            "metric": "disk_queue"
+          },
+          "annotations": {
+            "summary": "App Service Plan Disk Queue 嚴重過高 (CRITICAL)",
+            "description": "App Service Plan ${RESOURCE_NAME} 的 Disk Queue Length 在過去 30 分鐘平均超過緊急值 ${DISK_CRIT_THRESHOLD}。目前值: {{ $values.B.Value | printf \"%.0f\" }}。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/asp-disk-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AppServicePlan-Prod-Network-Traffic",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "asp-prod-netin-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Network In Warning > 80% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${ASP_NAME}",
+                  "metricNamespace": "Microsoft.Web/serverfarms",
+                  "metricName": "BytesReceived",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Total",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": {
+                "from": 3600,
+                "to": 0
+              }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "reduce",
+                "expression": "A",
+                "reducer": "mean",
+                "settings": {}
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        "${NET_IN_WARN_BYTES}"
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "query": {
+                      "params": [
+                        "B"
+                      ]
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": {
+            "severity": "warning",
+            "environment": "prod",
+            "resource_type": "app_service_plan",
+            "metric": "network_in"
+          },
+          "annotations": {
+            "summary": "App Service Plan 網路流量 In 超過 80% 上限",
+            "description": "App Service Plan ${RESOURCE_NAME} 的 BytesReceived 在過去 60 分鐘平均超過 ${NET_IN_WARN_BYTES} bytes/min（80% 上限）。目前值: {{ $values.B.Value | printf \"%.0f\" }} bytes/min",
+            "runbook_url": "https://wiki.internal/runbook/asp-network-high"
+          }
+        },
+        {
+          "uid": "asp-prod-netin-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Network In Critical > 90% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${ASP_NAME}",
+                  "metricNamespace": "Microsoft.Web/serverfarms",
+                  "metricName": "BytesReceived",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Total",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": {
+                "from": 1800,
+                "to": 0
+              }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "reduce",
+                "expression": "A",
+                "reducer": "mean",
+                "settings": {}
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        "${NET_IN_CRIT_BYTES}"
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "query": {
+                      "params": [
+                        "B"
+                      ]
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": {
+            "severity": "critical",
+            "environment": "prod",
+            "resource_type": "app_service_plan",
+            "metric": "network_in"
+          },
+          "annotations": {
+            "summary": "App Service Plan 網路流量 In 超過 90% 上限 - 緊急",
+            "description": "App Service Plan ${RESOURCE_NAME} 的 BytesReceived 在過去 30 分鐘平均超過 ${NET_IN_CRIT_BYTES} bytes/min（90% 上限）。立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/asp-network-high"
+          }
+        },
+        {
+          "uid": "asp-prod-netout-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Network Out Warning > 80% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${ASP_NAME}",
+                  "metricNamespace": "Microsoft.Web/serverfarms",
+                  "metricName": "BytesSent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Total",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": {
+                "from": 3600,
+                "to": 0
+              }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "reduce",
+                "expression": "A",
+                "reducer": "mean",
+                "settings": {}
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        "${NET_OUT_WARN_BYTES}"
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "query": {
+                      "params": [
+                        "B"
+                      ]
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": {
+            "severity": "warning",
+            "environment": "prod",
+            "resource_type": "app_service_plan",
+            "metric": "network_out"
+          },
+          "annotations": {
+            "summary": "App Service Plan 網路流量 Out 超過 80% 上限",
+            "description": "App Service Plan ${RESOURCE_NAME} 的 BytesSent 在過去 60 分鐘平均超過 ${NET_OUT_WARN_BYTES} bytes/min（80% 上限）。目前值: {{ $values.B.Value | printf \"%.0f\" }} bytes/min",
+            "runbook_url": "https://wiki.internal/runbook/asp-network-high"
+          }
+        },
+        {
+          "uid": "asp-prod-netout-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Network Out Critical > 90% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${ASP_NAME}",
+                  "metricNamespace": "Microsoft.Web/serverfarms",
+                  "metricName": "BytesSent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Total",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": {
+                "from": 1800,
+                "to": 0
+              }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "reduce",
+                "expression": "A",
+                "reducer": "mean",
+                "settings": {}
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        "${NET_OUT_CRIT_BYTES}"
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "query": {
+                      "params": [
+                        "B"
+                      ]
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": {
+            "severity": "critical",
+            "environment": "prod",
+            "resource_type": "app_service_plan",
+            "metric": "network_out"
+          },
+          "annotations": {
+            "summary": "App Service Plan 網路流量 Out 超過 90% 上限 - 緊急",
+            "description": "App Service Plan ${RESOURCE_NAME} 的 BytesSent 在過去 30 分鐘平均超過 ${NET_OUT_CRIT_BYTES} bytes/min（90% 上限）。立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/asp-network-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AppServicePlan-Prod-SocketOutbound",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "asp-prod-sockout-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Socket Outbound Warning > 80% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${ASP_NAME}",
+                  "metricNamespace": "Microsoft.Web/serverfarms",
+                  "metricName": "SocketOutboundEstablished",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": {
+                "from": 3600,
+                "to": 0
+              }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "reduce",
+                "expression": "A",
+                "reducer": "mean",
+                "settings": {}
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        "${SOCK_OUT_WARN}"
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "query": {
+                      "params": [
+                        "B"
+                      ]
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": {
+            "severity": "warning",
+            "environment": "prod",
+            "resource_type": "app_service_plan",
+            "metric": "socket_outbound"
+          },
+          "annotations": {
+            "summary": "App Service Plan Outbound Socket 連線數過高 (WARNING)",
+            "description": "App Service Plan ${RESOURCE_NAME} 的 SocketOutboundEstablished 在過去 60 分鐘平均超過 ${SOCK_OUT_WARN}（80% of port limit）。目前值: {{ $values.B.Value | printf \"%.0f\" }}",
+            "runbook_url": "https://wiki.internal/runbook/asp-socket-high"
+          }
+        },
+        {
+          "uid": "asp-prod-sockout-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Socket Outbound Critical > 90% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${ASP_NAME}",
+                  "metricNamespace": "Microsoft.Web/serverfarms",
+                  "metricName": "SocketOutboundEstablished",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": {
+                "from": 1800,
+                "to": 0
+              }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "reduce",
+                "expression": "A",
+                "reducer": "mean",
+                "settings": {}
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "params": [
+                        "${SOCK_OUT_CRIT}"
+                      ],
+                      "type": "gt"
+                    },
+                    "operator": {
+                      "type": "and"
+                    },
+                    "query": {
+                      "params": [
+                        "B"
+                      ]
+                    },
+                    "reducer": {
+                      "params": [],
+                      "type": "last"
+                    },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 0,
+                "to": 0
+              }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": {
+            "severity": "critical",
+            "environment": "prod",
+            "resource_type": "app_service_plan",
+            "metric": "socket_outbound"
+          },
+          "annotations": {
+            "summary": "App Service Plan Outbound Socket 連線數嚴重過高 (CRITICAL)",
+            "description": "App Service Plan ${RESOURCE_NAME} 的 SocketOutboundEstablished 在過去 30 分鐘平均超過 ${SOCK_OUT_CRIT}（90% of port limit）。立即處理！目前值: {{ $values.B.Value | printf \"%.0f\" }}",
+            "runbook_url": "https://wiki.internal/runbook/asp-socket-high"
+          }
+        }
+      ]
+    }
+  ]
+}

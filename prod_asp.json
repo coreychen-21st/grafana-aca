@@ -1,0 +1,200 @@
+[
+  {
+    "capacity": 3,
+    "location": "Japan East",
+    "name": "AppPlan-PayLater-Prod-Public",
+    "resourceGroup": "paylaterRG",
+    "sku": "P0v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": {},
+    "tier": "Premium0V3"
+  },
+  {
+    "capacity": 1,
+    "location": "Japan East",
+    "name": "AppPlan-PayLater-Prod-Batch",
+    "resourceGroup": "paylaterRG",
+    "sku": "P0v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": {},
+    "tier": "Premium0V3"
+  },
+  {
+    "capacity": 3,
+    "location": "Japan East",
+    "name": "AppPlan-PayLater-Prod-Internal",
+    "resourceGroup": "paylaterRG",
+    "sku": "P0v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": {},
+    "tier": "Premium0V3"
+  },
+  {
+    "capacity": 3,
+    "location": "Japan East",
+    "name": "AppPlan-PayLater-Prod-Partner",
+    "resourceGroup": "paylaterRG",
+    "sku": "P0v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": {},
+    "tier": "Premium0V3"
+  },
+  {
+    "capacity": 1,
+    "location": "Southeast Asia",
+    "name": "AppPlan-Majipay-Prod-Frontend",
+    "resourceGroup": "Majipay資源群組",
+    "sku": "P0v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": {},
+    "tier": "Premium0V3"
+  },
+  {
+    "capacity": 1,
+    "location": "Southeast Asia",
+    "name": "AppPlan-Happyfan7-Prod-Frontend",
+    "resourceGroup": "廿一世紀數位科技股份有限公司",
+    "sku": "P0v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": {},
+    "tier": "Premium0V3"
+  },
+  {
+    "capacity": 3,
+    "location": "Southeast Asia",
+    "name": "AppPlan-EDDA-Prod-Public",
+    "resourceGroup": "EDDA_RG",
+    "sku": "P0v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": null,
+    "tier": "Premium0V3"
+  },
+  {
+    "capacity": 1,
+    "location": "Southeast Asia",
+    "name": "AppPlan-Sofapay-Prod-linux",
+    "resourceGroup": "rg_sofapay",
+    "sku": "P0v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": null,
+    "tier": "Premium0V3"
+  },
+  {
+    "capacity": 2,
+    "location": "Southeast Asia",
+    "name": "AppPlan-FlashFinance-Prod-Frontend",
+    "resourceGroup": "flash-finance-resourcegroup",
+    "sku": "P0v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": null,
+    "tier": "Premium0V3"
+  },
+  {
+    "capacity": 1,
+    "location": "Southeast Asia",
+    "name": "Majipay正式機方案",
+    "resourceGroup": "Majipay資源群組",
+    "sku": "P2v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": null,
+    "tier": "PremiumV3"
+  },
+  {
+    "capacity": 1,
+    "location": "Southeast Asia",
+    "name": "樂分期正式機",
+    "resourceGroup": "廿一世紀數位科技股份有限公司",
+    "sku": "P2v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": {},
+    "tier": "PremiumV3"
+  },
+  {
+    "capacity": 1,
+    "location": "Southeast Asia",
+    "name": "flashfinance正式機方案",
+    "resourceGroup": "flash-finance-resourcegroup",
+    "sku": "P1v4",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": null,
+    "tier": "PremiumV4"
+  },
+  {
+    "capacity": 1,
+    "location": "Southeast Asia",
+    "name": "AppPlan-Sofapay-Prod",
+    "resourceGroup": "rg_sofapay",
+    "sku": "P0v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": null,
+    "tier": "Premium0V3"
+  },
+  {
+    "capacity": 1,
+    "location": "Taiwan North",
+    "name": "ASP-AIService",
+    "resourceGroup": "aiservice-rg",
+    "sku": "P1v3",
+    "subscriptionId": "c9f80f0b-7d34-4410-a79c-ca23fb550d20",
+    "subscriptionName": "CA804030",
+    "tags": null,
+    "tier": "PremiumV3"
+  },
+  {
+    "capacity": 1,
+    "location": "Southeast Asia",
+    "name": "AppPlan-Fanpay-Prod-Frontend",
+    "resourceGroup": "FanPay正式機",
+    "sku": "P0v3",
+    "subscriptionId": "fc6b18ca-199c-4123-8097-834cfc7ac213",
+    "subscriptionName": "CA808046",
+    "tags": {},
+    "tier": "Premium0V3"
+  },
+  {
+    "capacity": 1,
+    "location": "Southeast Asia",
+    "name": "AppPlan-Gogopay-Prod-Frontend",
+    "resourceGroup": "分期趣正式機",
+    "sku": "P0v3",
+    "subscriptionId": "fc6b18ca-199c-4123-8097-834cfc7ac213",
+    "subscriptionName": "CA808046",
+    "tags": {},
+    "tier": "Premium0V3"
+  },
+  {
+    "capacity": 1,
+    "location": "Southeast Asia",
+    "name": "分期趣正式機App方案",
+    "resourceGroup": "分期趣正式機",
+    "sku": "P2v3",
+    "subscriptionId": "fc6b18ca-199c-4123-8097-834cfc7ac213",
+    "subscriptionName": "CA808046",
+    "tags": null,
+    "tier": "PremiumV3"
+  },
+  {
+    "capacity": 2,
+    "location": "Southeast Asia",
+    "name": "分期趣高效能正式機App方案",
+    "resourceGroup": "分期趣高效能正式機",
+    "sku": "P0v3",
+    "subscriptionId": "fc6b18ca-199c-4123-8097-834cfc7ac213",
+    "subscriptionName": "CA808046",
+    "tags": {},
+    "tier": "Premium0V3"
+  }
+]

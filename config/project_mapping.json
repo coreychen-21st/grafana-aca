@@ -1,0 +1,20 @@
+{
+  "_description": "Resource Group → Project mapping for Grafana folder organization. New projects only need a new entry here.",
+  "_rules": {
+    "matchOrder": "resourceNamePattern (if present) takes priority, then pure resourceGroup match, then fallback to RG name as folder",
+    "noMatchFallback": "use resourceGroup name as folder name"
+  },
+  "mappings": [
+    { "resourceGroup": "paylaterRG",                 "project": "PayLater" },
+    { "resourceGroup": "Majipay資源群組",              "project": "Majipay" },
+    { "resourceGroup": "廿一世紀數位科技股份有限公司",   "project": "Happyfan7" },
+    { "resourceGroup": "EDDA_RG",                     "project": "EDDA" },
+    { "resourceGroup": "rg_sofapay",                  "project": "Sofapay" },
+    { "resourceGroup": "flash-finance-resourcegroup", "project": "FlashFinance" },
+    { "resourceGroup": "aiservice-rg",                "project": "AIService" },
+    { "resourceGroup": "FanPay正式機",                 "project": "Fanpay" },
+    { "resourceGroup": "分期趣高效能正式機",            "project": "Gogopay" },
+    { "resourceGroup": "分期趣正式機", "resourceNamePattern": "crossplat", "project": "CrossPlatform" },
+    { "resourceGroup": "分期趣正式機", "resourceNamePattern": "gogopay|分期趣",  "project": "Gogopay" }
+  ]
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "Capacity": 1,
+    "Location": "Southeast Asia",
+    "Name": "AppPlan-Sofapay-Prod-linux",
+    "SKU": "P0v3"
+  },
+  {
+    "Capacity": 1,
+    "Location": "Southeast Asia",
+    "Name": "AppPlan-Sofapay-Prod",
+    "SKU": "P0v3"
+  }
+]
