@@ -28,9 +28,9 @@ _curl_auth() {
 
 grafana_health_check() {
   local code
-  code=$(_curl_auth -o /dev/null -w "%{http_code}" "${GRAFANA_URL}/api/health")
+  code=$(_curl_auth -o /dev/null -w "%{http_code}" "${GRAFANA_URL}/api/org")
   if [[ "$code" != "200" ]]; then
-    echo "ERROR: Grafana health check failed (HTTP $code)" >&2
+    echo "ERROR: Grafana auth check failed at /api/org (HTTP $code)" >&2
     return 1
   fi
   return 0
