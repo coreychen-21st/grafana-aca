@@ -181,8 +181,8 @@ do_plan() {
   existing_uids=$(echo "$existing" | jq '[.[].uid]')
 
   local to_create to_delete
-  to_create=$(echo "$expected_uids" "$existing_uids" | jq -c '.[0] - .[1]')
-  to_delete=$(echo "$existing_uids" "$expected_uids" | jq -c '.[1] - .[0]')
+  to_create=$(printf '%s\n%s\n' "$expected_uids" "$existing_uids" | jq -c -s '.[0] - .[1]')
+  to_delete=$(printf '%s\n%s\n' "$existing_uids" "$expected_uids" | jq -c -s '.[0] - .[1]')
 
   local create_count delete_count
   create_count=$(echo "$to_create" | jq 'length')
