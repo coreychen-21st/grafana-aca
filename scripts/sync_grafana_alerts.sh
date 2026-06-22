@@ -196,8 +196,8 @@ do_plan() {
   echo "$to_delete_rules" > /tmp/gf_to_delete.json
 
   jq -n \
-    --argjson create "$to_create_rules" \
-    --argjson delete "$to_delete_rules" \
+    --slurpfile create /tmp/gf_to_create.json \
+    --slurpfile delete /tmp/gf_to_delete.json \
     --argjson create_count "$create_count" \
     --argjson delete_count "$delete_count" \
     --argjson expected_count "$expected_count" \
@@ -207,8 +207,8 @@ do_plan() {
       existing_total: $existing_count,
       to_create_count: $create_count,
       to_delete_count: $delete_count,
-      to_create: $create,
-      to_delete: $delete
+      to_create: $create[0],
+      to_delete: $delete[0]
     }' > "$PLAN_FILE"
 
   echo ""
