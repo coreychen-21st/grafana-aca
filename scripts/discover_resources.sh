@@ -234,7 +234,7 @@ main() {
     project=$(resolve_project "$rg" "$name" "$sub_id")
     local updated
     updated=$(echo "$res" | jq -c --arg p "$project" '.project = $p')
-    final_json=$(echo "$final_json" "$updated" | jq -s 'add')
+    final_json=$(echo "$final_json" | jq -c --argjson obj "$updated" '. + [$obj]')
   done < <(echo "$all_resources" | jq -c '.[]')
 
   echo "$final_json" | jq '.' > "$OUTPUT_FILE"
