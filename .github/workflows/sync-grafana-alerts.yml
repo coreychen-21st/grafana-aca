@@ -71,25 +71,24 @@ jobs:
         id: runner-ip
         run: |
           RUNNER_IP=$(curl -s ifconfig.me)
+          RULE_NAME=$(echo "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-' | cut -c1-60)
           echo "runner_ip=${RUNNER_IP}" >> $GITHUB_OUTPUT
+          echo "rule_name=${RULE_NAME}" >> $GITHUB_OUTPUT
           echo "::notice::Runner Public IP: ${RUNNER_IP}"
+          echo "::notice::Whitelist Rule Name: ${RULE_NAME}"
 
       - name: Add Runner IP to ACA Whitelist
         run: |
           az extension add --name containerapp --upgrade 2>/dev/null || true
-          az containerapp ingress access-restriction remove \
-            --name ca-grafana-prod \
-            --resource-group rg-grafana-aca \
-            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
-            --rule-name "github-actions-runner" 2>/dev/null || true
           az containerapp ingress access-restriction set \
             --name ca-grafana-prod \
             --resource-group rg-grafana-aca \
             --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
-            --rule-name "github-actions-runner" \
+            --rule-name "${{ steps.runner-ip.outputs.rule_name }}" \
             --ip-address "${{ steps.runner-ip.outputs.runner_ip }}/32" \
             --action Allow \
-            --priority 300
+            --description "Temporary allow for GitHub Actions runner"
+          sleep 15
           echo "::notice::Added ${{ steps.runner-ip.outputs.runner_ip }}/32 to ACA whitelist"
 
       - name: Discover Resources
@@ -115,7 +114,7 @@ jobs:
             --name ca-grafana-prod \
             --resource-group rg-grafana-aca \
             --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
-            --rule-name "github-actions-runner" 2>/dev/null || true
+            --rule-name "${{ steps.runner-ip.outputs.rule_name }}" 2>/dev/null || true
           echo "::notice::Removed runner IP from ACA whitelist"
 
       - name: Summary
@@ -164,25 +163,24 @@ jobs:
         id: runner-ip
         run: |
           RUNNER_IP=$(curl -s ifconfig.me)
+          RULE_NAME=$(echo "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${GITHUB_JOB}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-' | cut -c1-60)
           echo "runner_ip=${RUNNER_IP}" >> $GITHUB_OUTPUT
+          echo "rule_name=${RULE_NAME}" >> $GITHUB_OUTPUT
           echo "::notice::Runner Public IP: ${RUNNER_IP}"
+          echo "::notice::Whitelist Rule Name: ${RULE_NAME}"
 
       - name: Add Runner IP to ACA Whitelist
         run: |
           az extension add --name containerapp --upgrade 2>/dev/null || true
-          az containerapp ingress access-restriction remove \
-            --name ca-grafana-prod \
-            --resource-group rg-grafana-aca \
-            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
-            --rule-name "github-actions-runner" 2>/dev/null || true
           az containerapp ingress access-restriction set \
             --name ca-grafana-prod \
             --resource-group rg-grafana-aca \
             --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
-            --rule-name "github-actions-runner" \
+            --rule-name "${{ steps.runner-ip.outputs.rule_name }}" \
             --ip-address "${{ steps.runner-ip.outputs.runner_ip }}/32" \
             --action Allow \
-            --priority 300
+            --description "Temporary allow for GitHub Actions runner"
+          sleep 15
           echo "::notice::Added ${{ steps.runner-ip.outputs.runner_ip }}/32 to ACA whitelist"
 
       - name: Discover Resources
@@ -208,7 +206,7 @@ jobs:
             --name ca-grafana-prod \
             --resource-group rg-grafana-aca \
             --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
-            --rule-name "github-actions-runner" 2>/dev/null || true
+            --rule-name "${{ steps.runner-ip.outputs.rule_name }}" 2>/dev/null || true
           echo "::notice::Removed runner IP from ACA whitelist"
 
       - name: Summary
