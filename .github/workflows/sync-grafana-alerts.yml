@@ -4,14 +4,31 @@ on:
   schedule:
     - cron: '0 2 * * *'
   workflow_call:
+    inputs:
+      subscription:
+        type: string
+        required: true
+        description: 'Which subscription to sync (ca804030 or ca808046)'
   workflow_dispatch:
+    inputs:
+      subscription:
+        type: choice
+        required: true
+        description: 'Select subscription to sync'
+        options:
+          - 'CA804030 (c9f80f0b-7d34-4410-a79c-ca23fb550d20)'
+          - 'CA808046 (fc6b18ca-199c-4123-8097-834cfc7ac213)'
 
 env:
   GRAFANA_URL: ${{ vars.GRAFANA_URL }}
   AZURE_DATASOURCE_UID: ${{ vars.AZURE_DATASOURCE_UID }}
 
 jobs:
-  discover-ca804030:
+  sync-ca804030:
+    if: |
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && startsWith(inputs.subscription, 'CA804030')) ||
+      (github.event_name == 'workflow_call' && inputs.subscription == 'ca804030')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,16 +45,26 @@ jobs:
         run: |
           bash scripts/discover_resources.sh \
             --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
-            --output inventory_ca804030.json
+            --output inventory.json
 
-      - name: Upload Inventory
-        uses: actions/upload-artifact@v4
-        with:
-          name: inventory-ca804030
-          path: inventory_ca804030.json
-          retention-days: 1
+      - name: Plan (Diff)
+        run: bash scripts/sync_grafana_alerts.sh plan
+        env:
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
 
-  discover-ca808046:
+      - name: Apply Changes
+        run: bash scripts/sync_grafana_alerts.sh apply
+        env:
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+
+      - name: Summary
+        run: bash scripts/sync_grafana_alerts.sh summary >> $GITHUB_STEP_SUMMARY
+
+  sync-ca808046:
+    if: |
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && startsWith(inputs.subscription, 'CA808046')) ||
+      (github.event_name == 'workflow_call' && inputs.subscription == 'ca808046')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -54,33 +81,7 @@ jobs:
         run: |
           bash scripts/discover_resources.sh \
             --subscription fc6b18ca-199c-4123-8097-834cfc7ac213 \
-            --output inventory_ca808046.json
-
-      - name: Upload Inventory
-        uses: actions/upload-artifact@v4
-        with:
-          name: inventory-ca808046
-          path: inventory_ca808046.json
-          retention-days: 1
-
-  sync:
-    needs: [discover-ca804030, discover-ca808046]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download Inventories
-        uses: actions/download-artifact@v4
-        with:
-          pattern: inventory-*
-          merge-multiple: true
-          path: .
-
-      - name: Merge Inventories
-        run: |
-          jq -s 'add' inventory_ca804030.json inventory_ca808046.json > inventory.json
-          echo "Merged inventory:"
-          jq -r '.[] | "  [\(.type)] \(.project) / \(.name)"' inventory.json
+            --output inventory.json
 
       - name: Plan (Diff)
         run: bash scripts/sync_grafana_alerts.sh plan
