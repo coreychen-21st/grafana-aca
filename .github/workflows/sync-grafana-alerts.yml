@@ -67,6 +67,31 @@ jobs:
           subscription-id: c9f80f0b-7d34-4410-a79c-ca23fb550d20
           enable-AzPSSession: false
 
+      - name: Get Runner Public IP
+        id: runner-ip
+        run: |
+          RUNNER_IP=$(curl -s ifconfig.me)
+          echo "runner_ip=${RUNNER_IP}" >> $GITHUB_OUTPUT
+          echo "::notice::Runner Public IP: ${RUNNER_IP}"
+
+      - name: Add Runner IP to ACA Whitelist
+        run: |
+          az extension add --name containerapp --upgrade 2>/dev/null || true
+          az containerapp ingress access-restriction remove \
+            --name ca-grafana-prod \
+            --resource-group rg-grafana-aca \
+            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
+            --rule-name "github-actions-runner" 2>/dev/null || true
+          az containerapp ingress access-restriction set \
+            --name ca-grafana-prod \
+            --resource-group rg-grafana-aca \
+            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
+            --rule-name "github-actions-runner" \
+            --ip-address "${{ steps.runner-ip.outputs.runner_ip }}/32" \
+            --action Allow \
+            --priority 300
+          echo "::notice::Added ${{ steps.runner-ip.outputs.runner_ip }}/32 to ACA whitelist"
+
       - name: Discover Resources
         run: |
           bash scripts/discover_resources.sh \
@@ -82,6 +107,16 @@ jobs:
         run: bash scripts/sync_grafana_alerts.sh apply
         env:
           GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+
+      - name: Remove Runner IP from ACA Whitelist
+        if: always()
+        run: |
+          az containerapp ingress access-restriction remove \
+            --name ca-grafana-prod \
+            --resource-group rg-grafana-aca \
+            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
+            --rule-name "github-actions-runner" 2>/dev/null || true
+          echo "::notice::Removed runner IP from ACA whitelist"
 
       - name: Summary
         run: bash scripts/sync_grafana_alerts.sh summary >> $GITHUB_STEP_SUMMARY
@@ -125,6 +160,31 @@ jobs:
           subscription-id: fc6b18ca-199c-4123-8097-834cfc7ac213
           enable-AzPSSession: false
 
+      - name: Get Runner Public IP
+        id: runner-ip
+        run: |
+          RUNNER_IP=$(curl -s ifconfig.me)
+          echo "runner_ip=${RUNNER_IP}" >> $GITHUB_OUTPUT
+          echo "::notice::Runner Public IP: ${RUNNER_IP}"
+
+      - name: Add Runner IP to ACA Whitelist
+        run: |
+          az extension add --name containerapp --upgrade 2>/dev/null || true
+          az containerapp ingress access-restriction remove \
+            --name ca-grafana-prod \
+            --resource-group rg-grafana-aca \
+            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
+            --rule-name "github-actions-runner" 2>/dev/null || true
+          az containerapp ingress access-restriction set \
+            --name ca-grafana-prod \
+            --resource-group rg-grafana-aca \
+            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
+            --rule-name "github-actions-runner" \
+            --ip-address "${{ steps.runner-ip.outputs.runner_ip }}/32" \
+            --action Allow \
+            --priority 300
+          echo "::notice::Added ${{ steps.runner-ip.outputs.runner_ip }}/32 to ACA whitelist"
+
       - name: Discover Resources
         run: |
           bash scripts/discover_resources.sh \
@@ -140,6 +200,16 @@ jobs:
         run: bash scripts/sync_grafana_alerts.sh apply
         env:
           GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+
+      - name: Remove Runner IP from ACA Whitelist
+        if: always()
+        run: |
+          az containerapp ingress access-restriction remove \
+            --name ca-grafana-prod \
+            --resource-group rg-grafana-aca \
+            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
+            --rule-name "github-actions-runner" 2>/dev/null || true
+          echo "::notice::Removed runner IP from ACA whitelist"
 
       - name: Summary
         run: bash scripts/sync_grafana_alerts.sh summary >> $GITHUB_STEP_SUMMARY
