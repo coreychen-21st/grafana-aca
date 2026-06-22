@@ -1,0 +1,924 @@
+{
+  "_comment": "Grafana Alert Rules Template for Azure SQL Elastic Pool - Prod",
+  "_version": "1.0.0",
+  "_resourceType": "SQLElasticPool",
+  "_metricNamespace": "Microsoft.Sql/servers/elasticpools",
+  "_variablePlaceholders": {
+    "AZURE_DATASOURCE_UID": "Azure Monitor datasource UID in Grafana",
+    "RESOURCE_GROUP": "Azure resource group name",
+    "RESOURCE_NAME": "Elastic Pool name",
+    "SUBSCRIPTION_ID": "Azure subscription ID"
+  },
+  "groups": [
+    {
+      "name": "Pool-Prod-CPU",
+      "interval": "5m",
+      "rules": [
+        {
+          "uid": "pool-prod-cpu-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - CPU > 75% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "cpu_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [75], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "cpu" },
+          "annotations": {
+            "summary": "Elastic Pool CPU > 75%",
+            "description": "${RESOURCE_NAME} cpu_percent 在過去 60 分鐘平均超過 75%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%",
+            "runbook_url": "https://wiki.internal/runbook/pool-cpu-high"
+          }
+        },
+        {
+          "uid": "pool-prod-cpu-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - CPU > 80% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "cpu_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [80], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "cpu" },
+          "annotations": {
+            "summary": "Elastic Pool CPU > 80% - CRITICAL",
+            "description": "${RESOURCE_NAME} cpu_percent 在過去 30 分鐘平均超過 80%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/pool-cpu-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool-Prod-Storage",
+      "interval": "10m",
+      "rules": [
+        {
+          "uid": "pool-prod-stor-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Storage > 75% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "storage_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [75], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "storage" },
+          "annotations": {
+            "summary": "Elastic Pool Storage > 75%",
+            "description": "${RESOURCE_NAME} storage_percent 在過去 60 分鐘平均超過 75%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%",
+            "runbook_url": "https://wiki.internal/runbook/pool-storage-high"
+          }
+        },
+        {
+          "uid": "pool-prod-stor-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Storage > 80% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "storage_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [80], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "storage" },
+          "annotations": {
+            "summary": "Elastic Pool Storage > 80% - CRITICAL",
+            "description": "${RESOURCE_NAME} storage_percent 在過去 30 分鐘平均超過 80%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/pool-storage-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool-Prod-Workers",
+      "interval": "5m",
+      "rules": [
+        {
+          "uid": "pool-prod-work-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Workers > 75% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "workers_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [75], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "workers" },
+          "annotations": {
+            "summary": "Elastic Pool Workers > 75%",
+            "description": "${RESOURCE_NAME} workers_percent 在過去 60 分鐘平均超過 75%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%",
+            "runbook_url": "https://wiki.internal/runbook/pool-workers-high"
+          }
+        },
+        {
+          "uid": "pool-prod-work-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Workers > 80% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "workers_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [80], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "workers" },
+          "annotations": {
+            "summary": "Elastic Pool Workers > 80% - CRITICAL",
+            "description": "${RESOURCE_NAME} workers_percent 在過去 30 分鐘平均超過 80%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/pool-workers-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool-Prod-Sessions",
+      "interval": "5m",
+      "rules": [
+        {
+          "uid": "pool-prod-sess-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Sessions > 75% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "sessions_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [75], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "sessions" },
+          "annotations": {
+            "summary": "Elastic Pool Sessions > 75%",
+            "description": "${RESOURCE_NAME} sessions_percent 在過去 60 分鐘平均超過 75%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%",
+            "runbook_url": "https://wiki.internal/runbook/pool-sessions-high"
+          }
+        },
+        {
+          "uid": "pool-prod-sess-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Sessions > 80% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "sessions_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [80], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "sessions" },
+          "annotations": {
+            "summary": "Elastic Pool Sessions > 80% - CRITICAL",
+            "description": "${RESOURCE_NAME} sessions_percent 在過去 30 分鐘平均超過 80%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/pool-sessions-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool-Prod-DataIO",
+      "interval": "5m",
+      "rules": [
+        {
+          "uid": "pool-prod-dio-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Data IO > 75% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "physical_data_read_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [75], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "data_io" },
+          "annotations": {
+            "summary": "Elastic Pool Data IO > 75%",
+            "description": "${RESOURCE_NAME} physical_data_read_percent 在過去 60 分鐘平均超過 75%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%",
+            "runbook_url": "https://wiki.internal/runbook/pool-dataio-high"
+          }
+        },
+        {
+          "uid": "pool-prod-dio-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Data IO > 80% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "physical_data_read_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [80], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "data_io" },
+          "annotations": {
+            "summary": "Elastic Pool Data IO > 80% - CRITICAL",
+            "description": "${RESOURCE_NAME} physical_data_read_percent 在過去 30 分鐘平均超過 80%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/pool-dataio-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool-Prod-LogIO",
+      "interval": "5m",
+      "rules": [
+        {
+          "uid": "pool-prod-lio-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - Log IO > 75% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "log_write_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [75], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "log_io" },
+          "annotations": {
+            "summary": "Elastic Pool Log IO > 75%",
+            "description": "${RESOURCE_NAME} log_write_percent 在過去 60 分鐘平均超過 75%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%",
+            "runbook_url": "https://wiki.internal/runbook/pool-logio-high"
+          }
+        },
+        {
+          "uid": "pool-prod-lio-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - Log IO > 80% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "log_write_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [80], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "log_io" },
+          "annotations": {
+            "summary": "Elastic Pool Log IO > 80% - CRITICAL",
+            "description": "${RESOURCE_NAME} log_write_percent 在過去 30 分鐘平均超過 80%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/pool-logio-high"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pool-Prod-TempDB",
+      "interval": "10m",
+      "rules": [
+        {
+          "uid": "pool-prod-tdb-warn",
+          "title": "[WARN] ${RESOURCE_NAME} - TempDB Log > 75% (60min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "tempdb_log_used_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 3600, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [75], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "60m",
+          "labels": { "severity": "warning", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "tempdb_log" },
+          "annotations": {
+            "summary": "Elastic Pool TempDB Log > 75%",
+            "description": "${RESOURCE_NAME} tempdb_log_used_percent 在過去 60 分鐘平均超過 75%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%",
+            "runbook_url": "https://wiki.internal/runbook/pool-tempdb-high"
+          }
+        },
+        {
+          "uid": "pool-prod-tdb-crit",
+          "title": "[CRIT] ${RESOURCE_NAME} - TempDB Log > 80% (30min)",
+          "condition": "C",
+          "data": [
+            {
+              "refId": "A",
+              "datasourceUid": "${AZURE_DATASOURCE_UID}",
+              "queryType": "Azure Monitor",
+              "model": {
+                "azureMonitor": {
+                  "resourceGroup": "${RESOURCE_GROUP}",
+                  "resourceName": "${RESOURCE_NAME}",
+                  "metricNamespace": "Microsoft.Sql/servers/elasticpools",
+                  "metricName": "tempdb_log_used_percent",
+                  "timeGrain": "PT1M",
+                  "aggregation": "Average",
+                  "subscriptionId": "${SUBSCRIPTION_ID}"
+                },
+                "queryType": "Azure Monitor",
+                "subscription": "${SUBSCRIPTION_ID}"
+              },
+              "relativeTimeRange": { "from": 1800, "to": 0 }
+            },
+            {
+              "refId": "B",
+              "datasourceUid": "-100",
+              "model": { "type": "reduce", "expression": "A", "reducer": "mean", "settings": {} },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "-100",
+              "model": {
+                "type": "threshold",
+                "inputSeries": "B",
+                "conditions": [
+                  {
+                    "evaluator": { "params": [80], "type": "gt" },
+                    "operator": { "type": "and" },
+                    "query": { "params": ["B"] },
+                    "reducer": { "params": [], "type": "last" },
+                    "type": "query"
+                  }
+                ],
+                "expression": "B"
+              },
+              "queryType": "",
+              "relativeTimeRange": { "from": 0, "to": 0 }
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Error",
+          "for": "30m",
+          "labels": { "severity": "critical", "environment": "prod", "resource_type": "sql_elastic_pool", "metric": "tempdb_log" },
+          "annotations": {
+            "summary": "Elastic Pool TempDB Log > 80% - CRITICAL",
+            "description": "${RESOURCE_NAME} tempdb_log_used_percent 在過去 30 分鐘平均超過 80%。目前值: {{ $values.B.Value | printf \"%.1f\" }}%。請立即處理！",
+            "runbook_url": "https://wiki.internal/runbook/pool-tempdb-high"
+          }
+        }
+      ]
+    }
+  ]
+}

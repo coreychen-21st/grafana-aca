@@ -40,10 +40,10 @@ calc_threshold() {
 get_template_file() {
   local res_type="$1"
   case "$res_type" in
-    AppServicePlan) echo "${TEMPLATE_DIR}/app_service_plan.json" ;;
-    Redis)          echo "${TEMPLATE_DIR}/redis_managed.json" ;;
-    SQLServer)      echo "${TEMPLATE_DIR}/sql_server.json" ;;
-    *)              echo "" ;;
+    AppServicePlan)  echo "${TEMPLATE_DIR}/app_service_plan.json" ;;
+    Redis)           echo "${TEMPLATE_DIR}/redis_managed.json" ;;
+    SQLElasticPool)  echo "${TEMPLATE_DIR}/sql_elastic_pool.json" ;;
+    *)               echo "" ;;
   esac
 }
 

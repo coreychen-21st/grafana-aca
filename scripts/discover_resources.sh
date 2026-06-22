@@ -144,39 +144,62 @@ discover_redis() {
     ]'
 }
 
-discover_sql() {
+discover_elastic_pool() {
   local sub_id="$1"
   local sub_name="$2"
-  log "  Discovering SQL Servers..."
+  log "  Discovering SQL Elastic Pools..."
 
   local servers
   servers=$(az sql server list \
     --subscription "$sub_id" \
-    --query "[].{name:name, resourceGroup:resourceGroup, location:location, state:state, tags:tags}" \
+    --query "[?state=='Ready'].{name:name, resourceGroup:resourceGroup}" \
     -o json 2>/dev/null || echo "[]")
 
-  local count
-  count=$(echo "$servers" | jq 'length')
-  log "    Found $count SQL Servers total"
+  local pools_json="[]"
+  while IFS= read -r server; do
+    local srv_name srv_rg
+    srv_name=$(echo "$server" | jq -r '.name')
+    srv_rg=$(echo "$server" | jq -r '.resourceGroup')
 
-  echo "$servers" | jq -c --arg sub_id "$sub_id" --arg sub_name "$sub_name" '
-    [.[] |
-     select(.state == "Ready") |
-     select(
-       (.name | test("prod|prd|production"; "i")) or
-       (.name | test("正式機|正式")) or
-       (.resourceGroup | test("prod|prd|production"; "i")) or
-       (.resourceGroup | test("正式機|正式"))
-     ) |
-     {
-       type: "SQLServer",
-       name: .name,
-       resourceGroup: .resourceGroup,
-       location: .location,
-       subscriptionId: $sub_id,
-       subscriptionName: $sub_name
-     }
-    ]'
+    local pools
+    pools=$(az sql elastic-pool list \
+      --server "$srv_name" \
+      --resource-group "$srv_rg" \
+      --subscription "$sub_id" \
+      --query "[?state=='Ready'].{name:name, location:location, sku:sku.name, tier:sku.tier, capacity:sku.capacity, serverName: '${srv_name}'}" \
+      -o json 2>/dev/null || echo "[]")
+
+    local filtered
+    filtered=$(echo "$pools" | jq -c --arg sub_id "$sub_id" --arg sub_name "$sub_name" --arg srv_rg "$srv_rg" '
+      [.[] |
+       select(
+         (.name | test("prod|prd|production"; "i")) or
+         (.name | test("正式機|正式")) or
+         ($srv_rg | test("prod|prd|production"; "i")) or
+         ($srv_rg | test("正式機|正式"))
+       ) |
+       {
+         type: "SQLElasticPool",
+         name: .name,
+         serverName: .serverName,
+         resourceGroup: $srv_rg,
+         location: .location,
+         sku: .sku,
+         tier: .tier,
+         capacity: .capacity,
+         subscriptionId: $sub_id,
+         subscriptionName: $sub_name
+       }
+     ]')
+
+    pools_json=$(echo "$pools_json" "$filtered" | jq -s 'add')
+  done < <(echo "$servers" | jq -c '.[]')
+
+  local count
+  count=$(echo "$pools_json" | jq 'length')
+  log "    Found $count Elastic Pools total"
+
+  echo "$pools_json"
 }
 
 main() {
@@ -200,13 +223,13 @@ main() {
     sub_name=$(echo "$subscriptions" | jq -r --arg id "$sub_id" '.[] | select(.id==$id) | .name')
     log "  Processing: $sub_name ($sub_id)"
 
-    local asp_json redis_json sql_json
+    local asp_json redis_json pool_json
     asp_json=$(discover_asp "$sub_id" "$sub_name")
     redis_json=$(discover_redis "$sub_id" "$sub_name")
-    sql_json=$(discover_sql "$sub_id" "$sub_name")
+    pool_json=$(discover_elastic_pool "$sub_id" "$sub_name")
 
     local merged
-    merged=$(echo "$asp_json" "$redis_json" "$sql_json" | jq -s 'add')
+    merged=$(echo "$asp_json" "$redis_json" "$pool_json" | jq -s 'add')
     all_resources=$(echo "$all_resources" "$merged" | jq -s 'add')
   done < <(echo "$subscriptions" | jq -r '.[].id')
 
@@ -214,11 +237,11 @@ main() {
   total=$(echo "$all_resources" | jq 'length')
   log "  Total resources discovered: $total"
 
-  local asp_count redis_count sql_count
+  local asp_count redis_count pool_count
   asp_count=$(echo "$all_resources" | jq '[.[] | select(.type=="AppServicePlan")] | length')
   redis_count=$(echo "$all_resources" | jq '[.[] | select(.type=="Redis")] | length')
-  sql_count=$(echo "$all_resources" | jq '[.[] | select(.type=="SQLServer")] | length')
-  log "  ASP: $asp_count | Redis: $redis_count | SQL: $sql_count"
+  pool_count=$(echo "$all_resources" | jq '[.[] | select(.type=="SQLElasticPool")] | length')
+  log "  ASP: $asp_count | Redis: $redis_count | ElasticPool: $pool_count"
 
   log "  Resolving project mappings..."
   all_resources=$(echo "$all_resources" | jq -c '
