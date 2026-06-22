@@ -102,6 +102,11 @@ jobs:
             --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
             --output inventory.json
 
+      - name: Reset Existing Grafana Rules
+        run: bash scripts/sync_grafana_alerts.sh reset
+        env:
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+
       - name: Plan (Diff)
         run: bash scripts/sync_grafana_alerts.sh plan
         env:
@@ -200,6 +205,11 @@ jobs:
           bash scripts/discover_resources.sh \
             --subscription fc6b18ca-199c-4123-8097-834cfc7ac213 \
             --output inventory.json
+
+      - name: Reset Existing Grafana Rules
+        run: bash scripts/sync_grafana_alerts.sh reset
+        env:
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
 
       - name: Plan (Diff)
         run: bash scripts/sync_grafana_alerts.sh plan

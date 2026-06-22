@@ -9,7 +9,7 @@
 #   bash discover_resources.sh --output my_inv.json     # custom output file
 #   bash discover_resources.sh --subscription <id>      # specific subscription
 # ============================================================
-set -euo pipefail
+set -u
 
 OUTPUT_FILE="inventory.json"
 TARGET_SUBSCRIPTION=""

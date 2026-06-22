@@ -6,7 +6,7 @@
 # ============================================================
 
 #set -euo pipefail
-set -u pipefail
+set -u
 
 OUTPUT_FILE="prod_asp.json"
 

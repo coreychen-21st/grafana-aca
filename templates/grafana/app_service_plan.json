@@ -321,7 +321,7 @@
                 "inputSeries": "B",
                 "conditions": [
                   {
-                    "evaluator": { "params": ["${DISK_WARN_THRESHOLD}"], "type": "gt" },
+                    "evaluator": { "params": [${DISK_WARN_THRESHOLD}], "type": "gt" },
                     "operator": { "type": "and" },
                     "query": { "params": ["B"] },
                     "reducer": { "params": [], "type": "last" },
@@ -383,7 +383,7 @@
                 "inputSeries": "B",
                 "conditions": [
                   {
-                    "evaluator": { "params": ["${DISK_CRIT_THRESHOLD}"], "type": "gt" },
+                    "evaluator": { "params": [${DISK_CRIT_THRESHOLD}], "type": "gt" },
                     "operator": { "type": "and" },
                     "query": { "params": ["B"] },
                     "reducer": { "params": [], "type": "last" },
@@ -451,7 +451,7 @@
                 "inputSeries": "B",
                 "conditions": [
                   {
-                    "evaluator": { "params": ["${NET_IN_WARN_BYTES}"], "type": "gt" },
+                    "evaluator": { "params": [${NET_IN_WARN_BYTES}], "type": "gt" },
                     "operator": { "type": "and" },
                     "query": { "params": ["B"] },
                     "reducer": { "params": [], "type": "last" },
@@ -513,7 +513,7 @@
                 "inputSeries": "B",
                 "conditions": [
                   {
-                    "evaluator": { "params": ["${NET_IN_CRIT_BYTES}"], "type": "gt" },
+                    "evaluator": { "params": [${NET_IN_CRIT_BYTES}], "type": "gt" },
                     "operator": { "type": "and" },
                     "query": { "params": ["B"] },
                     "reducer": { "params": [], "type": "last" },
@@ -581,7 +581,7 @@
                 "inputSeries": "B",
                 "conditions": [
                   {
-                    "evaluator": { "params": ["${NET_OUT_WARN_BYTES}"], "type": "gt" },
+                    "evaluator": { "params": [${NET_OUT_WARN_BYTES}], "type": "gt" },
                     "operator": { "type": "and" },
                     "query": { "params": ["B"] },
                     "reducer": { "params": [], "type": "last" },
@@ -643,7 +643,7 @@
                 "inputSeries": "B",
                 "conditions": [
                   {
-                    "evaluator": { "params": ["${NET_OUT_CRIT_BYTES}"], "type": "gt" },
+                    "evaluator": { "params": [${NET_OUT_CRIT_BYTES}], "type": "gt" },
                     "operator": { "type": "and" },
                     "query": { "params": ["B"] },
                     "reducer": { "params": [], "type": "last" },
@@ -711,7 +711,7 @@
                 "inputSeries": "B",
                 "conditions": [
                   {
-                    "evaluator": { "params": ["${SOCK_OUT_WARN}"], "type": "gt" },
+                    "evaluator": { "params": [${SOCK_OUT_WARN}], "type": "gt" },
                     "operator": { "type": "and" },
                     "query": { "params": ["B"] },
                     "reducer": { "params": [], "type": "last" },
@@ -773,7 +773,7 @@
                 "inputSeries": "B",
                 "conditions": [
                   {
-                    "evaluator": { "params": ["${SOCK_OUT_CRIT}"], "type": "gt" },
+                    "evaluator": { "params": [${SOCK_OUT_CRIT}], "type": "gt" },
                     "operator": { "type": "and" },
                     "query": { "params": ["B"] },
                     "reducer": { "params": [], "type": "last" },

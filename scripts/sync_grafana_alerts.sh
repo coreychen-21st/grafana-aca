@@ -344,6 +344,43 @@ do_apply() {
   fi
 }
 
+do_reset() {
+  log "==> RESET MODE: Deleting all existing Grafana alert rules"
+
+  grafana_health_check || exit 1
+
+  local existing
+  existing=$(grafana_list_all_rules)
+
+  local total
+  total=$(echo "$existing" | jq 'length')
+  log "  Existing rules to delete: $total"
+
+  if [[ "$total" -eq 0 ]]; then
+    log "  No rules found. Nothing to delete."
+    return 0
+  fi
+
+  local deleted=0 failed=0
+  while IFS= read -r uid; do
+    if [[ -z "$uid" || "$uid" == "null" ]]; then
+      continue
+    fi
+    if grafana_rule_delete "$uid"; then
+      deleted=$((deleted + 1))
+    else
+      failed=$((failed + 1))
+    fi
+  done < <(echo "$existing" | jq -r '.[].uid')
+
+  log "  Deleted: $deleted | Failed: $failed"
+
+  if [[ "$failed" -gt 0 ]]; then
+    err "Reset completed with failures."
+    exit 1
+  fi
+}
+
 do_summary() {
   if [[ ! -f "$PLAN_FILE" ]]; then
     echo "No plan file found. Run 'plan' first."
@@ -395,12 +432,14 @@ do_summary() {
 case "${1:-}" in
   plan)    do_plan ;;
   apply)   do_apply ;;
+  reset)   do_reset ;;
   summary) do_summary ;;
   *)
-    echo "Usage: $0 {plan|apply|summary}"
+    echo "Usage: $0 {plan|apply|reset|summary}"
     echo ""
     echo "  plan    - Dry-run: compare expected vs existing, show diff"
     echo "  apply   - Apply changes to Grafana (create new, delete orphaned)"
+    echo "  reset   - Delete all existing Grafana alert rules"
     echo "  summary - Print markdown summary for GitHub step summary"
     exit 1
     ;;
