@@ -82,13 +82,20 @@ build_expected_rules() {
   local expected="[]"
 
   while IFS= read -r res; do
-    local res_type name rg sub_id sku project
+    local res_type name rg sub_id sku project server_name resource_name
     res_type=$(echo "$res" | jq -r '.type')
     name=$(echo "$res" | jq -r '.name')
     rg=$(echo "$res" | jq -r '.resourceGroup')
     sub_id=$(echo "$res" | jq -r '.subscriptionId')
     sku=$(echo "$res" | jq -r '.sku // ""')
     project=$(echo "$res" | jq -r '.project')
+    server_name=$(echo "$res" | jq -r '.serverName // ""')
+
+    if [[ "$res_type" == "SQLElasticPool" && -n "$server_name" ]]; then
+      resource_name="${server_name}/elasticPools/${name}"
+    else
+      resource_name="$name"
+    fi
 
     local template_file
     template_file=$(get_template_file "$res_type")
@@ -106,7 +113,7 @@ build_expected_rules() {
     rules_json=$(echo "$rules_json" | \
       sed "s|\${AZURE_DATASOURCE_UID}|$AZURE_DATASOURCE_UID|g" | \
       sed "s|\${RESOURCE_GROUP}|$rg|g" | \
-      sed "s|\${RESOURCE_NAME}|$name|g" | \
+      sed "s|\${RESOURCE_NAME}|$resource_name|g" | \
       sed "s|\${ASP_NAME}|$name|g" | \
       sed "s|\${SUBSCRIPTION_ID}|$sub_id|g")
 
