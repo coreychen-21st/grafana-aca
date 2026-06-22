@@ -88,7 +88,12 @@ jobs:
             --ip-address "${{ steps.runner-ip.outputs.runner_ip }}/32" \
             --action Allow \
             --description "Temporary allow for GitHub Actions runner"
-          sleep 15
+          sleep 45
+          az containerapp ingress access-restriction list \
+            --name ca-grafana-prod \
+            --resource-group rg-grafana-aca \
+            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
+            --output json
           echo "::notice::Added ${{ steps.runner-ip.outputs.runner_ip }}/32 to ACA whitelist"
 
       - name: Discover Resources
@@ -182,7 +187,12 @@ jobs:
             --ip-address "${{ steps.runner-ip.outputs.runner_ip }}/32" \
             --action Allow \
             --description "Temporary allow for GitHub Actions runner"
-          sleep 15
+          sleep 45
+          az containerapp ingress access-restriction list \
+            --name ca-grafana-prod \
+            --resource-group rg-grafana-aca \
+            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
+            --output json
           echo "::notice::Added ${{ steps.runner-ip.outputs.runner_ip }}/32 to ACA whitelist"
 
       - name: Discover Resources
