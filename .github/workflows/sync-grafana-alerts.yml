@@ -20,8 +20,8 @@ on:
           - 'CA808046 (fc6b18ca-199c-4123-8097-834cfc7ac213)'
 
 env:
-  GRAFANA_URL: ${{ vars.GRAFANA_URL }}
-  AZURE_DATASOURCE_UID: ${{ vars.AZURE_DATASOURCE_UID }}
+  GRAFANA_URL: ${{ secrets.GRAFANA_URL }}
+  AZURE_DATASOURCE_UID: ${{ secrets.AZURE_DATASOURCE_UID }}
 
 jobs:
   sync-ca804030:
@@ -33,11 +33,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate Required Secrets (CA804030)
+        env:
+          GRAFANA_URL_SECRET: ${{ secrets.GRAFANA_URL }}
+          AZURE_DATASOURCE_UID_SECRET: ${{ secrets.AZURE_DATASOURCE_UID }}
+          GRAFANA_TOKEN_SECRET: ${{ secrets.GRAFANA_TOKEN }}
+          AZURE_CLIENT_ID_SECRET: ${{ secrets.AZURE_CLIENT_ID_CA804030 }}
+          AZURE_TENANT_ID_SECRET: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          missing=()
+          [[ -z "$GRAFANA_URL_SECRET" ]] && missing+=("GRAFANA_URL")
+          [[ -z "$AZURE_DATASOURCE_UID_SECRET" ]] && missing+=("AZURE_DATASOURCE_UID")
+          [[ -z "$GRAFANA_TOKEN_SECRET" ]] && missing+=("GRAFANA_TOKEN")
+          [[ -z "$AZURE_CLIENT_ID_SECRET" ]] && missing+=("AZURE_CLIENT_ID_CA804030")
+          [[ -z "$AZURE_TENANT_ID_SECRET" ]] && missing+=("AZURE_TENANT_ID")
+
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error::Missing required repository secrets: ${missing[*]}"
+            exit 1
+          fi
+
+          echo "Required secrets check passed."
+
       - name: Azure Login (CA804030)
         uses: azure/login@v2
         with:
-          client-id: ${{ vars.AZURE_CLIENT_ID_CA804030 }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID_CA804030 }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: c9f80f0b-7d34-4410-a79c-ca23fb550d20
           enable-AzPSSession: false
 
@@ -69,11 +91,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate Required Secrets (CA808046)
+        env:
+          GRAFANA_URL_SECRET: ${{ secrets.GRAFANA_URL }}
+          AZURE_DATASOURCE_UID_SECRET: ${{ secrets.AZURE_DATASOURCE_UID }}
+          GRAFANA_TOKEN_SECRET: ${{ secrets.GRAFANA_TOKEN }}
+          AZURE_CLIENT_ID_SECRET: ${{ secrets.AZURE_CLIENT_ID_CA808046 }}
+          AZURE_TENANT_ID_SECRET: ${{ secrets.AZURE_TENANT_ID_CA808046 }}
+        run: |
+          missing=()
+          [[ -z "$GRAFANA_URL_SECRET" ]] && missing+=("GRAFANA_URL")
+          [[ -z "$AZURE_DATASOURCE_UID_SECRET" ]] && missing+=("AZURE_DATASOURCE_UID")
+          [[ -z "$GRAFANA_TOKEN_SECRET" ]] && missing+=("GRAFANA_TOKEN")
+          [[ -z "$AZURE_CLIENT_ID_SECRET" ]] && missing+=("AZURE_CLIENT_ID_CA808046")
+          [[ -z "$AZURE_TENANT_ID_SECRET" ]] && missing+=("AZURE_TENANT_ID_CA808046")
+
+          if (( ${#missing[@]} > 0 )); then
+            echo "::error::Missing required repository secrets: ${missing[*]}"
+            exit 1
+          fi
+
+          echo "Required secrets check passed."
+
       - name: Azure Login (CA808046)
         uses: azure/login@v2
         with:
-          client-id: ${{ vars.AZURE_CLIENT_ID_CA808046 }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID_CA808046 }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID_CA808046 }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID_CA808046 }}
           subscription-id: fc6b18ca-199c-4123-8097-834cfc7ac213
           enable-AzPSSession: false
 
