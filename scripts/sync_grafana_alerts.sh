@@ -256,6 +256,11 @@ do_apply() {
   to_create_rules=$(cat /tmp/gf_to_create.json 2>/dev/null || echo "[]")
   to_delete_rules=$(cat /tmp/gf_to_delete.json 2>/dev/null || echo "[]")
 
+  if [[ "${DELETE_ORPHANS:-false}" != "true" ]]; then
+    to_delete_rules="[]"
+    log "  DELETE_ORPHANS=false: keeping all existing rules"
+  fi
+
   local create_count delete_count
   create_count=$(echo "$to_create_rules" | jq 'length')
   delete_count=$(echo "$to_delete_rules" | jq 'length')

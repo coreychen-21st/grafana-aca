@@ -13,6 +13,11 @@ on:
         type: string
         required: true
         description: 'Which subscription to sync (ca804030 or ca808046)'
+      full_reset:
+        type: boolean
+        required: false
+        default: false
+        description: 'Delete all existing rules before syncing'
   workflow_dispatch:
     inputs:
       subscription:
@@ -22,6 +27,11 @@ on:
         options:
           - 'CA804030 (c9f80f0b-7d34-4410-a79c-ca23fb550d20)'
           - 'CA808046 (fc6b18ca-199c-4123-8097-834cfc7ac213)'
+      full_reset:
+        type: boolean
+        required: false
+        default: false
+        description: 'Delete all existing Grafana rules before syncing (full rebuild)'
 
 env:
   GRAFANA_URL: ${{ secrets.GRAFANA_URL }}
@@ -103,6 +113,7 @@ jobs:
             --output inventory.json
 
       - name: Reset Existing Grafana Rules
+        if: inputs.full_reset == true
         run: bash scripts/sync_grafana_alerts.sh reset
         env:
           GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
@@ -116,6 +127,7 @@ jobs:
         run: bash scripts/sync_grafana_alerts.sh apply
         env:
           GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+          DELETE_ORPHANS: ${{ inputs.full_reset == true }}
 
       - name: Remove Runner IP from ACA Whitelist
         if: always()
@@ -207,6 +219,7 @@ jobs:
             --output inventory.json
 
       - name: Reset Existing Grafana Rules
+        if: inputs.full_reset == true
         run: bash scripts/sync_grafana_alerts.sh reset
         env:
           GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
@@ -220,6 +233,7 @@ jobs:
         run: bash scripts/sync_grafana_alerts.sh apply
         env:
           GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+          DELETE_ORPHANS: ${{ inputs.full_reset == true }}
 
       - name: Remove Runner IP from ACA Whitelist
         if: always()
