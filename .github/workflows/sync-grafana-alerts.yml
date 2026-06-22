@@ -119,6 +119,8 @@ jobs:
 
       - name: Summary
         run: bash scripts/sync_grafana_alerts.sh summary >> $GITHUB_STEP_SUMMARY
+        env:
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
 
   sync-ca808046:
     if: |
@@ -211,3 +213,5 @@ jobs:
 
       - name: Summary
         run: bash scripts/sync_grafana_alerts.sh summary >> $GITHUB_STEP_SUMMARY
+        env:
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}

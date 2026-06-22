@@ -12,7 +12,8 @@
 #   GRAFANA_URL, GRAFANA_TOKEN (or GRAFANA_USER + GRAFANA_PASS)
 #   AZURE_DATASOURCE_UID
 # ============================================================
-set -euo pipefail
+set -u
+#set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
