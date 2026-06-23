@@ -31,6 +31,7 @@ LOG_FILE="/tmp/grafana_sync_$(date +%Y%m%d_%H%M%S).log"
 source "${SCRIPT_DIR}/lib/grafana_api.sh"
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" | tee -a "$LOG_FILE"; }
+warn() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] WARN: $*" | tee -a "$LOG_FILE"; }
 err() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: $*" | tee -a "$LOG_FILE" >&2; }
 
 calc_threshold() {
@@ -91,8 +92,16 @@ build_expected_rules() {
     project=$(echo "$res" | jq -r '.project')
     server_name=$(echo "$res" | jq -r '.serverName // ""')
 
-    if [[ "$res_type" == "SQLElasticPool" && -n "$server_name" ]]; then
-      resource_name="${server_name}/elasticPools/${name}"
+    if [[ "$res_type" == "SQLElasticPool" ]]; then
+      if [[ -z "$server_name" ]]; then
+        warn "  SQLElasticPool missing serverName, skipping resourceGroup=$rg name=$name"
+        continue
+      fi
+      if [[ "$name" == "elasticPools" || "$name" == *"/"* || "$name" == *"\\"* ]]; then
+        warn "  SQLElasticPool invalid name, skipping resourceGroup=$rg serverName=$server_name name=$name"
+        continue
+      fi
+      resource_name="${server_name}/${name}"
     else
       resource_name="$name"
     fi
@@ -263,7 +272,7 @@ do_apply() {
   to_create_rules=$(cat /tmp/gf_to_create.json 2>/dev/null || echo "[]")
   to_delete_rules=$(cat /tmp/gf_to_delete.json 2>/dev/null || echo "[]")
 
-  if [[ "${DELETE_ORPHANS:-false}" != "true" ]]; then
+  if [[ "${DELETE_ORPHANS:-true}" != "true" ]]; then
     to_delete_rules="[]"
     log "  DELETE_ORPHANS=false: keeping all existing rules"
   fi
