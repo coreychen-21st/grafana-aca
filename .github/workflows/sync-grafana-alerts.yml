@@ -139,57 +139,60 @@ jobs:
           APP_SUB="c9f80f0b-7d34-4410-a79c-ca23fb550d20"
           RULE_NAME="${{ steps.runner-ip.outputs.rule_name }}"
           RUNNER_CIDR="${{ steps.runner-ip.outputs.runner_ip }}/32"
+          APP_ID="/subscriptions/${APP_SUB}/resourceGroups/${APP_RG}/providers/Microsoft.App/containerApps/${APP_NAME}"
 
           echo "::notice::Cleanup start: rule=${RULE_NAME}, ip=${RUNNER_CIDR}"
 
-          MATCH_BY_NAME=$(az containerapp ingress access-restriction list \
-            --name "$APP_NAME" \
-            --resource-group "$APP_RG" \
-            --subscription "$APP_SUB" \
-            --query "[?name=='$RULE_NAME'] | length(@)" \
-            --output tsv 2>/dev/null || echo "0")
+          PATCHED="false"
+          for attempt in 1 2 3; do
+            APP_JSON=$(az rest \
+              --method GET \
+              --uri "${APP_ID}?api-version=2024-03-01" \
+              --output json)
 
-          if [[ "$MATCH_BY_NAME" != "0" ]]; then
-            if az containerapp ingress access-restriction remove \
-              --name "$APP_NAME" \
-              --resource-group "$APP_RG" \
-              --subscription "$APP_SUB" \
-              --rule-name "$RULE_NAME"; then
-              echo "::notice::Removed whitelist rule by name: ${RULE_NAME}"
-            else
-              echo "::warning::Failed to remove whitelist rule by name: ${RULE_NAME}"
+            ETAG=$(echo "$APP_JSON" | jq -r '.etag // "*"')
+            INGRESS=$(echo "$APP_JSON" | jq -c '.properties.configuration.ingress // {}')
+            CURRENT_RULES=$(echo "$INGRESS" | jq -c '.ipSecurityRestrictions // []')
+            FILTERED_RULES=$(echo "$CURRENT_RULES" | jq -c --arg rule "$RULE_NAME" --arg cidr "$RUNNER_CIDR" '
+              [.[] |
+                select((.name // "") != $rule) |
+                select((.ipAddressRange // .ipAddress // "") != $cidr)
+              ]')
+
+            REMOVED_COUNT=$(echo "$CURRENT_RULES" "$FILTERED_RULES" | jq -s '.[0] | length - (.[1] | length)')
+            if [[ "$REMOVED_COUNT" == "0" ]]; then
+              echo "::notice::No matching whitelist rule found to remove"
+              PATCHED="true"
+              break
             fi
-          else
-            echo "::warning::Rule not found by name: ${RULE_NAME}"
-          fi
 
-          FALLBACK_RULES=$(az containerapp ingress access-restriction list \
-            --name "$APP_NAME" \
-            --resource-group "$APP_RG" \
-            --subscription "$APP_SUB" \
-            --query "[?ipAddressRange=='$RUNNER_CIDR' || ipAddress=='$RUNNER_CIDR'].name" \
-            --output tsv 2>/dev/null || true)
+            NEW_INGRESS=$(echo "$INGRESS" | jq -c --argjson rules "$FILTERED_RULES" '. + {ipSecurityRestrictions: $rules}')
+            PATCH_BODY=$(jq -cn --argjson ingress "$NEW_INGRESS" '{properties:{configuration:{ingress:$ingress}}}')
 
-          if [[ -n "$FALLBACK_RULES" ]]; then
-            while IFS= read -r fallback_name; do
-              [[ -z "$fallback_name" ]] && continue
-              if az containerapp ingress access-restriction remove \
-                --name "$APP_NAME" \
-                --resource-group "$APP_RG" \
-                --subscription "$APP_SUB" \
-                --rule-name "$fallback_name"; then
-                echo "::notice::Removed fallback whitelist rule: ${fallback_name}"
-              else
-                echo "::warning::Failed to remove fallback whitelist rule: ${fallback_name}"
-              fi
-            done <<< "$FALLBACK_RULES"
+            if az rest \
+              --method PATCH \
+              --uri "${APP_ID}?api-version=2024-03-01" \
+              --headers "If-Match=$ETAG" "Content-Type=application/json" \
+              --body "$PATCH_BODY" \
+              --output none; then
+              echo "::notice::Removed ${REMOVED_COUNT} whitelist rule(s) via REST PATCH"
+              PATCHED="true"
+              break
+            fi
+
+            echo "::warning::Whitelist patch attempt ${attempt} failed; retrying"
+            sleep 2
+          done
+
+          if [[ "$PATCHED" != "true" ]]; then
+            echo "::warning::Whitelist cleanup patch failed after retries"
           fi
 
           REMAINING=$(az containerapp ingress access-restriction list \
             --name "$APP_NAME" \
             --resource-group "$APP_RG" \
             --subscription "$APP_SUB" \
-            --query "[?name=='$RULE_NAME'] | length(@)" \
+            --query "[?name=='$RULE_NAME' || ipAddressRange=='$RUNNER_CIDR' || ipAddress=='$RUNNER_CIDR'] | length(@)" \
             --output tsv 2>/dev/null || echo "0")
 
           if [[ "$REMAINING" != "0" ]]; then
@@ -304,57 +307,60 @@ jobs:
           APP_SUB="c9f80f0b-7d34-4410-a79c-ca23fb550d20"
           RULE_NAME="${{ steps.runner-ip.outputs.rule_name }}"
           RUNNER_CIDR="${{ steps.runner-ip.outputs.runner_ip }}/32"
+          APP_ID="/subscriptions/${APP_SUB}/resourceGroups/${APP_RG}/providers/Microsoft.App/containerApps/${APP_NAME}"
 
           echo "::notice::Cleanup start: rule=${RULE_NAME}, ip=${RUNNER_CIDR}"
 
-          MATCH_BY_NAME=$(az containerapp ingress access-restriction list \
-            --name "$APP_NAME" \
-            --resource-group "$APP_RG" \
-            --subscription "$APP_SUB" \
-            --query "[?name=='$RULE_NAME'] | length(@)" \
-            --output tsv 2>/dev/null || echo "0")
+          PATCHED="false"
+          for attempt in 1 2 3; do
+            APP_JSON=$(az rest \
+              --method GET \
+              --uri "${APP_ID}?api-version=2024-03-01" \
+              --output json)
 
-          if [[ "$MATCH_BY_NAME" != "0" ]]; then
-            if az containerapp ingress access-restriction remove \
-              --name "$APP_NAME" \
-              --resource-group "$APP_RG" \
-              --subscription "$APP_SUB" \
-              --rule-name "$RULE_NAME"; then
-              echo "::notice::Removed whitelist rule by name: ${RULE_NAME}"
-            else
-              echo "::warning::Failed to remove whitelist rule by name: ${RULE_NAME}"
+            ETAG=$(echo "$APP_JSON" | jq -r '.etag // "*"')
+            INGRESS=$(echo "$APP_JSON" | jq -c '.properties.configuration.ingress // {}')
+            CURRENT_RULES=$(echo "$INGRESS" | jq -c '.ipSecurityRestrictions // []')
+            FILTERED_RULES=$(echo "$CURRENT_RULES" | jq -c --arg rule "$RULE_NAME" --arg cidr "$RUNNER_CIDR" '
+              [.[] |
+                select((.name // "") != $rule) |
+                select((.ipAddressRange // .ipAddress // "") != $cidr)
+              ]')
+
+            REMOVED_COUNT=$(echo "$CURRENT_RULES" "$FILTERED_RULES" | jq -s '.[0] | length - (.[1] | length)')
+            if [[ "$REMOVED_COUNT" == "0" ]]; then
+              echo "::notice::No matching whitelist rule found to remove"
+              PATCHED="true"
+              break
             fi
-          else
-            echo "::warning::Rule not found by name: ${RULE_NAME}"
-          fi
 
-          FALLBACK_RULES=$(az containerapp ingress access-restriction list \
-            --name "$APP_NAME" \
-            --resource-group "$APP_RG" \
-            --subscription "$APP_SUB" \
-            --query "[?ipAddressRange=='$RUNNER_CIDR' || ipAddress=='$RUNNER_CIDR'].name" \
-            --output tsv 2>/dev/null || true)
+            NEW_INGRESS=$(echo "$INGRESS" | jq -c --argjson rules "$FILTERED_RULES" '. + {ipSecurityRestrictions: $rules}')
+            PATCH_BODY=$(jq -cn --argjson ingress "$NEW_INGRESS" '{properties:{configuration:{ingress:$ingress}}}')
 
-          if [[ -n "$FALLBACK_RULES" ]]; then
-            while IFS= read -r fallback_name; do
-              [[ -z "$fallback_name" ]] && continue
-              if az containerapp ingress access-restriction remove \
-                --name "$APP_NAME" \
-                --resource-group "$APP_RG" \
-                --subscription "$APP_SUB" \
-                --rule-name "$fallback_name"; then
-                echo "::notice::Removed fallback whitelist rule: ${fallback_name}"
-              else
-                echo "::warning::Failed to remove fallback whitelist rule: ${fallback_name}"
-              fi
-            done <<< "$FALLBACK_RULES"
+            if az rest \
+              --method PATCH \
+              --uri "${APP_ID}?api-version=2024-03-01" \
+              --headers "If-Match=$ETAG" "Content-Type=application/json" \
+              --body "$PATCH_BODY" \
+              --output none; then
+              echo "::notice::Removed ${REMOVED_COUNT} whitelist rule(s) via REST PATCH"
+              PATCHED="true"
+              break
+            fi
+
+            echo "::warning::Whitelist patch attempt ${attempt} failed; retrying"
+            sleep 2
+          done
+
+          if [[ "$PATCHED" != "true" ]]; then
+            echo "::warning::Whitelist cleanup patch failed after retries"
           fi
 
           REMAINING=$(az containerapp ingress access-restriction list \
             --name "$APP_NAME" \
             --resource-group "$APP_RG" \
             --subscription "$APP_SUB" \
-            --query "[?name=='$RULE_NAME'] | length(@)" \
+            --query "[?name=='$RULE_NAME' || ipAddressRange=='$RUNNER_CIDR' || ipAddress=='$RUNNER_CIDR'] | length(@)" \
             --output tsv 2>/dev/null || echo "0")
 
           if [[ "$REMAINING" != "0" ]]; then
