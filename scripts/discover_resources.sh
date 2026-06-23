@@ -63,7 +63,7 @@ is_prod_resource() {
   local tags_json="$3"
 
   local combined="${name} ${rg} ${tags_json}"
-  if echo "$combined" | grep -qiE 'prod|prd|production|正式機|正式'; then
+  if echo "$combined" | grep -qiE 'prod|pro|production|正式機|正式'; then
     return 0
   fi
   return 1
@@ -87,9 +87,9 @@ discover_asp() {
   echo "$plans" | jq -c --arg sub_id "$sub_id" --arg sub_name "$sub_name" '
     [.[] |
      select(
-       (.name | test("prod|prd|production|ai|aiservice|taogefu|taoge|crossplat"; "i")) or
+       (.name | test("prod|pro|production|ai|aiservice|taogefu|taoge|crossplat"; "i")) or
        (.name | test("正式機|正式")) or
-       (.resourceGroup | test("prod|prd|production|ai|aiservice|taogefu|taoge|crossplat"; "i")) or
+       (.resourceGroup | test("prod|pro|production|ai|aiservice|taogefu|taoge|crossplat"; "i")) or
        (.resourceGroup | test("正式機|正式"))
      ) |
      select(.name | test("測試|test|Pi|PiEncr") | not) |
@@ -126,9 +126,9 @@ discover_redis() {
     [.[] |
      select(.provisioningState == "Succeeded") |
      select(
-       (.name | test("prod|prd|production"; "i")) or
+       (.name | test("prod|pro|production"; "i")) or
        (.name | test("正式機|正式")) or
-       (.resourceGroup | test("prod|prd|production"; "i")) or
+       (.resourceGroup | test("prod|pro|production"; "i")) or
        (.resourceGroup | test("正式機|正式"))
      ) |
      {
@@ -173,9 +173,9 @@ discover_elastic_pool() {
     filtered=$(echo "$pools" | jq -c --arg sub_id "$sub_id" --arg sub_name "$sub_name" --arg srv_rg "$srv_rg" '
       [.[] |
        select(
-         (.name | test("prod|prd|production"; "i")) or
+         (.name | test("prod|pro|production"; "i")) or
          (.name | test("正式機|正式")) or
-         ($srv_rg | test("prod|prd|production"; "i")) or
+         ($srv_rg | test("prod|pro|production"; "i")) or
          ($srv_rg | test("正式機|正式"))
        ) |
        {
