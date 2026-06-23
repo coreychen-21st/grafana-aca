@@ -6,7 +6,7 @@ permissions:
 
 on:
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '11 3 * * *'
   workflow_call:
     inputs:
       subscription:
