@@ -132,12 +132,71 @@ jobs:
       - name: Remove Runner IP from ACA Whitelist
         if: always()
         run: |
-          az containerapp ingress access-restriction remove \
-            --name ca-grafana-prod \
-            --resource-group rg-grafana-aca \
-            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
-            --rule-name "${{ steps.runner-ip.outputs.rule_name }}" 2>/dev/null || true
-          echo "::notice::Removed runner IP from ACA whitelist"
+          az extension add --name containerapp --upgrade 2>/dev/null || true
+
+          APP_NAME="ca-grafana-prod"
+          APP_RG="rg-grafana-aca"
+          APP_SUB="c9f80f0b-7d34-4410-a79c-ca23fb550d20"
+          RULE_NAME="${{ steps.runner-ip.outputs.rule_name }}"
+          RUNNER_CIDR="${{ steps.runner-ip.outputs.runner_ip }}/32"
+
+          echo "::notice::Cleanup start: rule=${RULE_NAME}, ip=${RUNNER_CIDR}"
+
+          MATCH_BY_NAME=$(az containerapp ingress access-restriction list \
+            --name "$APP_NAME" \
+            --resource-group "$APP_RG" \
+            --subscription "$APP_SUB" \
+            --query "[?name=='$RULE_NAME'] | length(@)" \
+            --output tsv 2>/dev/null || echo "0")
+
+          if [[ "$MATCH_BY_NAME" != "0" ]]; then
+            if az containerapp ingress access-restriction remove \
+              --name "$APP_NAME" \
+              --resource-group "$APP_RG" \
+              --subscription "$APP_SUB" \
+              --rule-name "$RULE_NAME"; then
+              echo "::notice::Removed whitelist rule by name: ${RULE_NAME}"
+            else
+              echo "::warning::Failed to remove whitelist rule by name: ${RULE_NAME}"
+            fi
+          else
+            echo "::warning::Rule not found by name: ${RULE_NAME}"
+          fi
+
+          FALLBACK_RULES=$(az containerapp ingress access-restriction list \
+            --name "$APP_NAME" \
+            --resource-group "$APP_RG" \
+            --subscription "$APP_SUB" \
+            --query "[?ipAddressRange=='$RUNNER_CIDR' || ipAddress=='$RUNNER_CIDR'].name" \
+            --output tsv 2>/dev/null || true)
+
+          if [[ -n "$FALLBACK_RULES" ]]; then
+            while IFS= read -r fallback_name; do
+              [[ -z "$fallback_name" ]] && continue
+              if az containerapp ingress access-restriction remove \
+                --name "$APP_NAME" \
+                --resource-group "$APP_RG" \
+                --subscription "$APP_SUB" \
+                --rule-name "$fallback_name"; then
+                echo "::notice::Removed fallback whitelist rule: ${fallback_name}"
+              else
+                echo "::warning::Failed to remove fallback whitelist rule: ${fallback_name}"
+              fi
+            done <<< "$FALLBACK_RULES"
+          fi
+
+          REMAINING=$(az containerapp ingress access-restriction list \
+            --name "$APP_NAME" \
+            --resource-group "$APP_RG" \
+            --subscription "$APP_SUB" \
+            --query "[?name=='$RULE_NAME'] | length(@)" \
+            --output tsv 2>/dev/null || echo "0")
+
+          if [[ "$REMAINING" != "0" ]]; then
+            echo "::warning::Whitelist cleanup incomplete: ${RULE_NAME} still exists"
+          else
+            echo "::notice::Whitelist cleanup complete"
+          fi
 
       - name: Summary
         run: bash scripts/sync_grafana_alerts.sh summary >> $GITHUB_STEP_SUMMARY
@@ -238,12 +297,71 @@ jobs:
       - name: Remove Runner IP from ACA Whitelist
         if: always()
         run: |
-          az containerapp ingress access-restriction remove \
-            --name ca-grafana-prod \
-            --resource-group rg-grafana-aca \
-            --subscription c9f80f0b-7d34-4410-a79c-ca23fb550d20 \
-            --rule-name "${{ steps.runner-ip.outputs.rule_name }}" 2>/dev/null || true
-          echo "::notice::Removed runner IP from ACA whitelist"
+          az extension add --name containerapp --upgrade 2>/dev/null || true
+
+          APP_NAME="ca-grafana-prod"
+          APP_RG="rg-grafana-aca"
+          APP_SUB="c9f80f0b-7d34-4410-a79c-ca23fb550d20"
+          RULE_NAME="${{ steps.runner-ip.outputs.rule_name }}"
+          RUNNER_CIDR="${{ steps.runner-ip.outputs.runner_ip }}/32"
+
+          echo "::notice::Cleanup start: rule=${RULE_NAME}, ip=${RUNNER_CIDR}"
+
+          MATCH_BY_NAME=$(az containerapp ingress access-restriction list \
+            --name "$APP_NAME" \
+            --resource-group "$APP_RG" \
+            --subscription "$APP_SUB" \
+            --query "[?name=='$RULE_NAME'] | length(@)" \
+            --output tsv 2>/dev/null || echo "0")
+
+          if [[ "$MATCH_BY_NAME" != "0" ]]; then
+            if az containerapp ingress access-restriction remove \
+              --name "$APP_NAME" \
+              --resource-group "$APP_RG" \
+              --subscription "$APP_SUB" \
+              --rule-name "$RULE_NAME"; then
+              echo "::notice::Removed whitelist rule by name: ${RULE_NAME}"
+            else
+              echo "::warning::Failed to remove whitelist rule by name: ${RULE_NAME}"
+            fi
+          else
+            echo "::warning::Rule not found by name: ${RULE_NAME}"
+          fi
+
+          FALLBACK_RULES=$(az containerapp ingress access-restriction list \
+            --name "$APP_NAME" \
+            --resource-group "$APP_RG" \
+            --subscription "$APP_SUB" \
+            --query "[?ipAddressRange=='$RUNNER_CIDR' || ipAddress=='$RUNNER_CIDR'].name" \
+            --output tsv 2>/dev/null || true)
+
+          if [[ -n "$FALLBACK_RULES" ]]; then
+            while IFS= read -r fallback_name; do
+              [[ -z "$fallback_name" ]] && continue
+              if az containerapp ingress access-restriction remove \
+                --name "$APP_NAME" \
+                --resource-group "$APP_RG" \
+                --subscription "$APP_SUB" \
+                --rule-name "$fallback_name"; then
+                echo "::notice::Removed fallback whitelist rule: ${fallback_name}"
+              else
+                echo "::warning::Failed to remove fallback whitelist rule: ${fallback_name}"
+              fi
+            done <<< "$FALLBACK_RULES"
+          fi
+
+          REMAINING=$(az containerapp ingress access-restriction list \
+            --name "$APP_NAME" \
+            --resource-group "$APP_RG" \
+            --subscription "$APP_SUB" \
+            --query "[?name=='$RULE_NAME'] | length(@)" \
+            --output tsv 2>/dev/null || echo "0")
+
+          if [[ "$REMAINING" != "0" ]]; then
+            echo "::warning::Whitelist cleanup incomplete: ${RULE_NAME} still exists"
+          else
+            echo "::notice::Whitelist cleanup complete"
+          fi
 
       - name: Summary
         run: bash scripts/sync_grafana_alerts.sh summary >> $GITHUB_STEP_SUMMARY
